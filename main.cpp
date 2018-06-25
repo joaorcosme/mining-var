@@ -20,7 +20,7 @@ class BarGraph
     BarGraph() = delete;
     BarGraph(const cv::Point& startPt, const double width,
                                        const double height,
-                                       unsigned nTiles = 50)
+                                       unsigned nTiles = 25)
     {
         const double totalSpacing = 0.2 * height;
         const double spacing = totalSpacing / (nTiles - 1);
@@ -34,37 +34,50 @@ class BarGraph
         unsigned i = 0;
         while (i++ < nTiles)
         {
-            cv::Rect rect(pt, tileSize);
-            cv::Scalar color(0,255,0);
-            m_tiles.emplace_back(rect, color); 
+            m_tiles.emplace_back(pt, tileSize); 
             pt.y += spacing + tileHeight;
         }
-        
     }
 
     unsigned getNumberOfTiles() { return m_tiles.size(); }
 
-    void draw(cv::Mat& frame, const double fraction)
-    {
-        assert(fraction >= 0 && fraction <= 1);
-        const int nFilledTiles = fraction * getNumberOfTiles();
-        int i = 0;
-        for(const auto& tile : m_tiles)
-        {
-            // negative thickness yields a filled rectangle
-            int thickness = i++ < nFilledTiles ? -1 : 1;
-            cv::rectangle(frame, tile.first, tile.second, thickness); 
-        }
-        std::string txt = std::to_string(static_cast<int>(100*fraction));
-        txt += "%";
-        cv::putText(frame, txt, m_txtOrg, m_fontFace, 1, cv::Scalar(0,0,255), 2);
-    }
+    void draw(cv::Mat& frame, const double fraction);
 
   private:
-    std::vector<std::pair<cv::Rect, cv::Scalar>> m_tiles;
+    void drawPercentageTxt(cv::Mat& frame, const double fraction);
+
+  private:
+    std::vector<cv::Rect> m_tiles;
     cv::Point m_txtOrg;
-    static constexpr int m_fontFace = cv::FONT_HERSHEY_SCRIPT_SIMPLEX;
+    static constexpr int m_fontFace = cv::FONT_HERSHEY_SIMPLEX;
 };
+
+void BarGraph::draw(cv::Mat& frame, const double fraction)
+{
+    assert(fraction >= 0 && fraction <= 1);
+    const int nFilledTiles = fraction * getNumberOfTiles();
+    int i = 0;
+    for(const auto& tile : m_tiles)
+    {
+        int thickness = 1;
+        cv::Scalar tileColor(255,255,255);
+        if (i++ < nFilledTiles)
+        {
+            // negative thickness yields a filled rectangle
+            thickness = -1;
+            tileColor = cv::Scalar(0,255,0);
+        }
+        cv::rectangle(frame, tile, tileColor, thickness); 
+    }
+    drawPercentageTxt(frame, fraction);
+}
+
+void BarGraph::drawPercentageTxt(cv::Mat& frame, const double fraction)
+{
+    std::string txt = std::to_string(static_cast<int>(100*fraction));
+    txt += "%";
+    cv::putText(frame, txt, m_txtOrg, m_fontFace, 1, cv::Scalar(0,0,255), 2);
+}
 
 
 class SimulatedSensor
@@ -127,9 +140,9 @@ int main(int argc, char** argv )
     // access built-in camera at index 0
     assert(cap.open(0));
 
-    BarGraph bGraph1(cv::Point(50,50), 50 /* width */, 400 /* height */);
-    BarGraph bGraph2(cv::Point(150,50), 50 /* width */, 400 /* height */);
-    BarGraph bGraph3(cv::Point(250,50), 50 /* width */, 400 /* height */);
+    BarGraph bGraph1(cv::Point(50,50), 80 /* width */, 300 /* height */);
+    BarGraph bGraph2(cv::Point(200,50), 80 /* width */, 300 /* height */);
+    BarGraph bGraph3(cv::Point(350,50), 80 /* width */, 300 /* height */);
 
     SimulatedSensor sensor1(1500 /* interval in ms */);
     SimulatedSensor sensor2(1500 /* interval in ms */);
