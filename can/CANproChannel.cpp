@@ -1,5 +1,7 @@
 #include "CANproChannel.h"
 
+#include <cassert>
+#include <iostream>
 #include <memory>
 #include <string>
 
@@ -48,7 +50,7 @@ CANproChannel::CANproChannel() {
     }
 
     assert(m_pChannel->u32DeviceType == CANPROUSB);
-    std::cout << "#INFO: 1 channel was found." << std::endl;
+    std::cout << "\n#INFO: 1 channel was found." << std::endl;
 
     printChannelInfo();
 
