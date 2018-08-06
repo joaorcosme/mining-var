@@ -1,15 +1,11 @@
 #include <errno.h>
-#include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/poll.h>
 #include <unistd.h>
 
-#include <cassert>
 #include <iostream>
-#include <memory>
-#include <string>
 #include <thread>
 
 #include "canL2.h"
