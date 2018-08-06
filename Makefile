@@ -1,4 +1,4 @@
-CC = g++ -std=c++11
+CC = g++ -std=c++11 -lpthread
 CFLAGS = -Wall
 OPENCV = `pkg-config opencv --cflags --libs`
 
