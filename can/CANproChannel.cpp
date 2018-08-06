@@ -94,7 +94,7 @@ void CANproChannel::setFifoMode() {
 }
 
 L2CONFIG CANproChannel::getLayer2Configuration() const {
-    L2CONFIG l2Config;
+    /*
     l2Config.bEnableAck = GET_FROM_SCIM;
     l2Config.bEnableErrorframe = GET_FROM_SCIM;
     l2Config.s32AccCodeStd = GET_FROM_SCIM;
@@ -107,21 +107,22 @@ L2CONFIG CANproChannel::getLayer2Configuration() const {
     l2Config.s32Sjw = GET_FROM_SCIM;
     l2Config.s32Tseg1 = GET_FROM_SCIM;
     l2Config.s32Tseg2 = GET_FROM_SCIM;
+    */
 
-    /*
-    l2Config.bEnableAck = 1;
-    l2Config.bEnableErrorframe = 0;
+    L2CONFIG l2Config;
+    l2Config.fBaudrate = 500.0;
+    l2Config.s32Prescaler = 8;
+    l2Config.s32Tseg1 = 11;
+    l2Config.s32Tseg2 = 8;
+    l2Config.s32Sjw = 2;
+    l2Config.s32Sam = 0;
     l2Config.s32AccCodeStd = 0;
     l2Config.s32AccCodeXtd = 0;
     l2Config.s32AccMaskStd = 0;
     l2Config.s32AccMaskXtd = 0;
     l2Config.s32OutputCtrl = 0xFA;
-    l2Config.s32Prescaler = 1;
-    l2Config.s32Sam = 0;
-    l2Config.s32Sjw = 2;
-    l2Config.s32Tseg1 = 4;
-    l2Config.s32Tseg2 = 3;
-    */
+    l2Config.bEnableAck = 1;
+    l2Config.bEnableErrorframe = 0;
 
     return l2Config;
 }
