@@ -3,13 +3,13 @@
 
 #include "canL2.h"
 
-#include <memory>
-
 class CANproChannel {
   public:
     CANproChannel &operator=(const CANproChannel) = delete;
     CANproChannel(const CANproChannel &) = delete;
+
     CANproChannel();
+    ~CANproChannel() { delete m_pChannel; }
 
     void printChannelInfo() const;
     CAN_HANDLE getHandle() const { return m_handle; }
@@ -17,12 +17,13 @@ class CANproChannel {
   private:
     void initializeChannel();
     void queryChannel();
-    void setFifoMode() const;
-    L2CONFIG getLayer2Configuration() const;
+    void setFifoMode();
+    void setLayer2Configuration();
 
   private:
-    std::unique_ptr<CHDSNAPSHOT> m_pChannel{new CHDSNAPSHOT};
     CAN_HANDLE m_handle;
+    L2CONFIG m_l2Config;
+    CHDSNAPSHOT* m_pChannel{new CHDSNAPSHOT};
 };
 
 #endif // __CAN_PRO_CHANNEL_H_

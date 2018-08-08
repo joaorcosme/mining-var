@@ -2,7 +2,6 @@
 
 #include <cassert>
 #include <iostream>
-#include <memory>
 #include <string>
 
 static std::string getDriverErrorMsg(const int code) {
@@ -50,7 +49,7 @@ void CANproChannel::queryChannel() {
 
     // now call the function with a valid buffer size and pointer to channel
     retCode = CANL2_get_all_CAN_channels(providedBufferSize, &neededBufferSize,
-                                         &nChannels, m_pChannel.get());
+                                         &nChannels, m_pChannel);
     if (retCode) {
         errorMsg = getDriverErrorMsg(retCode);
     } else if (m_pChannel->bIsOpen) {
@@ -85,47 +84,33 @@ void CANproChannel::initializeChannel() {
     m_handle = channel.ulChannelHandle;
 }
 
-void CANproChannel::setFifoMode() const {
-    L2CONFIG config = getLayer2Configuration();
-    int retCode = CANL2_initialize_fifo_mode(m_handle, &config);
+void CANproChannel::setFifoMode() {
+    setLayer2Configuration();
+    int retCode = CANL2_initialize_fifo_mode(m_handle, &m_l2Config);
     if (retCode) {
         throw std::runtime_error("#ERROR " + std::to_string(retCode) +
                                  " in INIL2_initialize_fifo_mode()");
     }
 }
 
-L2CONFIG CANproChannel::getLayer2Configuration() const {
-    L2CONFIG l2Config;
-    l2Config.bEnableAck = GET_FROM_SCIM;
-    l2Config.bEnableErrorframe = GET_FROM_SCIM;
-    l2Config.s32AccCodeStd = GET_FROM_SCIM;
-    l2Config.s32AccCodeXtd = GET_FROM_SCIM;
-    l2Config.s32AccMaskStd = GET_FROM_SCIM;
-    l2Config.s32AccMaskXtd = GET_FROM_SCIM;
-    l2Config.s32OutputCtrl = GET_FROM_SCIM;
-    l2Config.s32Prescaler = GET_FROM_SCIM;
-    l2Config.s32Sam = GET_FROM_SCIM;
-    l2Config.s32Sjw = GET_FROM_SCIM;
-    l2Config.s32Tseg1 = GET_FROM_SCIM;
-    l2Config.s32Tseg2 = GET_FROM_SCIM;
-/*
-    L2CONFIG l2Config;
-    l2Config.fBaudrate = 500.0;
-    l2Config.s32Prescaler = 8;
-    l2Config.s32Tseg1 = 11;
-    l2Config.s32Tseg2 = 8;
-    l2Config.s32Sjw = 2;
-    l2Config.s32Sam = 0;
-    l2Config.s32AccCodeStd = 0;
-    l2Config.s32AccCodeXtd = 0;
-    l2Config.s32AccMaskStd = 0;
-    l2Config.s32AccMaskXtd = 0;
-    l2Config.s32OutputCtrl = 0xFA;
-    l2Config.bEnableAck = 1;
-    l2Config.bEnableErrorframe = 0;
-    */
+void CANproChannel::setLayer2Configuration() {
 
-    return l2Config;
+    m_l2Config.fBaudrate = 500.00;
+    m_l2Config.s32Prescaler = 8;
+    m_l2Config.s32Tseg1 = 11;
+    m_l2Config.s32Tseg2 = 8;
+    m_l2Config.s32Sjw = GET_FROM_SCIM; // TODO: figure out why this won't accept
+                                       // a custom value. If I set '2' directly,
+                                       // the program is not able to read any
+                                       // data from the CAN bus.
+    m_l2Config.s32Sam = 0;
+    m_l2Config.s32AccCodeStd = 0;
+    m_l2Config.s32AccCodeXtd = 0;
+    m_l2Config.s32AccMaskStd = 0;
+    m_l2Config.s32AccMaskXtd = 0;
+    m_l2Config.s32OutputCtrl = 0xFA;
+    m_l2Config.bEnableAck = 1;
+    m_l2Config.bEnableErrorframe = 0;
 }
 
 void CANproChannel::printChannelInfo() const {
