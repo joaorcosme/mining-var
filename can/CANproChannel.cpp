@@ -10,10 +10,23 @@ static std::string getDriverErrorMsg(const int code) {
 }
 
 CANproChannel::CANproChannel() {
+    try {
+
+        queryChannel();
+        printChannelInfo();
+        initializeChannel();
+        setFifoMode();
+
+    } catch (...) {
+        throw;
+    }
+}
+
+void CANproChannel::queryChannel() {
     __u32 neededBufferSize, nChannels;
 
     // first, call the function without a valid
-    // buffer size to get the needed buffer size
+    // buffer size to get the required buffer size
     int retCode =
         CANL2_get_all_CAN_channels(0, &neededBufferSize, &nChannels, nullptr);
 
@@ -30,7 +43,6 @@ CANproChannel::CANproChannel() {
         throw std::runtime_error(errorMsg);
     }
 
-    // make sure we are dealing with exactly 1 channel
     assert(nChannels == 1);
     assert(neededBufferSize == sizeof(*m_pChannel));
 
@@ -51,17 +63,6 @@ CANproChannel::CANproChannel() {
 
     assert(m_pChannel->u32DeviceType == CANPROUSB);
     std::cout << "\n#INFO: 1 channel was found." << std::endl;
-
-    printChannelInfo();
-
-    try {
-
-        initializeChannel();
-        setFifoMode();
-
-    } catch (...) {
-        throw;
-    }
 }
 
 void CANproChannel::initializeChannel() {
@@ -84,7 +85,7 @@ void CANproChannel::initializeChannel() {
     m_handle = channel.ulChannelHandle;
 }
 
-void CANproChannel::setFifoMode() {
+void CANproChannel::setFifoMode() const {
     L2CONFIG config = getLayer2Configuration();
     int retCode = CANL2_initialize_fifo_mode(m_handle, &config);
     if (retCode) {
@@ -94,7 +95,7 @@ void CANproChannel::setFifoMode() {
 }
 
 L2CONFIG CANproChannel::getLayer2Configuration() const {
-    /*
+    L2CONFIG l2Config;
     l2Config.bEnableAck = GET_FROM_SCIM;
     l2Config.bEnableErrorframe = GET_FROM_SCIM;
     l2Config.s32AccCodeStd = GET_FROM_SCIM;
@@ -107,8 +108,7 @@ L2CONFIG CANproChannel::getLayer2Configuration() const {
     l2Config.s32Sjw = GET_FROM_SCIM;
     l2Config.s32Tseg1 = GET_FROM_SCIM;
     l2Config.s32Tseg2 = GET_FROM_SCIM;
-    */
-
+/*
     L2CONFIG l2Config;
     l2Config.fBaudrate = 500.0;
     l2Config.s32Prescaler = 8;
@@ -123,6 +123,7 @@ L2CONFIG CANproChannel::getLayer2Configuration() const {
     l2Config.s32OutputCtrl = 0xFA;
     l2Config.bEnableAck = 1;
     l2Config.bEnableErrorframe = 0;
+    */
 
     return l2Config;
 }

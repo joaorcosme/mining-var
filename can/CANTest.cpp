@@ -8,8 +8,12 @@
 #include <iostream>
 #include <thread>
 
-#include "canL2.h"
 #include "CANproChannel.h"
+#include "canL2.h"
+
+#define DEBUG_INTERRUPTION(MSG)                                                \
+    if (0)                                                                     \
+    std::cout << "#Debug Interruption Thread: " << MSG << std::endl
 
 // for time stamp calculation ...
 __u32 Time, diff_time, old_time;
@@ -18,12 +22,10 @@ __u32 Identifier = 0; // Identifier
 
 bool stop_thread1 = false;
 
-char *FormatData(char *buffer, unsigned char *pData, long dataLen) {
-    int i;
-
+static char *FormatData(char *buffer, unsigned char *pData, long dataLen) {
     memset(buffer, 0, 25);
 
-    for (i = 0; i < 8; i++) {
+    for (int i = 0; i < 8; ++i) {
         if (i < dataLen) {
             sprintf(&buffer[i * 3], "%3x", pData[i]);
         } else {
@@ -36,15 +38,15 @@ char *FormatData(char *buffer, unsigned char *pData, long dataLen) {
 
 //    ReadBusEventFIFO
 //    Reads the event data of a received event
-int ReadBusEvent(CAN_HANDLE can, int ch, unsigned long *diff_time,
-                 unsigned long *old_time) {
+static int ReadBusEvent(CAN_HANDLE can, int ch, __u32 *diff_time,
+                        __u32 *old_time) {
+    DEBUG_INTERRUPTION("ReadBusEvent(...)");
     char buffer[25];
 
     PARAM_STRUCT param;
     param.DataLength = 3;
 
     int frc = CANL2_read_ac(can, &param);
-
     switch (frc) {
     case CANL2_RA_DATAFRAME:
 
@@ -121,31 +123,20 @@ int ReadBusEvent(CAN_HANDLE can, int ch, unsigned long *diff_time,
     return (frc);
 }
 
-void interruptionThread(const CAN_HANDLE &can_channel) {
-    unsigned long diff_time = 0, old_time = 0;
-    int ret, RetCode;
+static void interruptionThread(CAN_HANDLE can_channel) {
+    DEBUG_INTERRUPTION("Thread start");
 
     struct pollfd can_poll;
-
     while (!stop_thread1) {
-        // in this implementation the CAN handle is the same as the file
-        // descriptor
-        // for driver access; Please use the following macro
-        // CANL2_handle_to_descriptor
-        // for compatibility with later versions of this API
-
         can_poll.fd = CANL2_handle_to_descriptor(can_channel);
         can_poll.events = POLLIN | POLLHUP;
 
+        int ret;
         do {
             ret = poll(&can_poll, 1, -1);
-            //  printf("interruptionThread: poll returned %u, events=0x%x.
-            //  revents=0x%x,
-            //  POLLHUP=0x%x\n",ret,can_poll.events,can_poll.revents,POLLHUP);
 
             if (can_poll.revents & POLLHUP) {
-                printf("terminating interruptionThread()\n");
-                exit(0);
+                DEBUG_INTERRUPTION("Thread end (a)");
                 return;
             }
 
@@ -155,17 +146,20 @@ void interruptionThread(const CAN_HANDLE &can_channel) {
             }
         } while (ret <= 0);
 
+        int RetCode;
         do {
             RetCode = ReadBusEvent(can_channel, 1, &diff_time, &old_time);
-            if (stop_thread1)
+            if (stop_thread1) {
+                DEBUG_INTERRUPTION("Thread end (b)");
                 return;
+            }
         } while (RetCode > 0);
 
-        if (RetCode < 0)
+        if (RetCode < 0) {
             stop_thread1 = true;
+        }
     }
-
-    printf("terminating interruptionThread\n");
+    DEBUG_INTERRUPTION("Thread end (c)");
     return;
 }
 
@@ -256,12 +250,13 @@ int main(int argc, char **argv) {
 
     try {
         CANproChannel channel;
-        std::cout << "#INFO: The CANpro channel is online now." << std::endl;
+        std::cout << "#INFO: The CANpro channel is now online." << std::endl;
 
-        std::thread interruptionHandler(interruptionThread, channel.getHandle());
+        std::thread interruptionHandler(interruptionThread,
+                                        channel.getHandle());
 
         // TODO: still needs refactoring (begin)
-        char option = 'h';
+        char option = 'y';
         while (option != 'q') {
             UserRequestFIFO(option, channel.getHandle());
             scanf("%c", &option);
@@ -269,10 +264,12 @@ int main(int argc, char **argv) {
 
         stop_thread1 = true;
 
+        std::cout << "#INFO: Resetting chip." << std::endl;
         CANL2_reset_chip(channel.getHandle());
 
         interruptionHandler.join();
 
+        std::cout << "#INFO: Closing CANpro channel." << std::endl;
         INIL2_close_channel(channel.getHandle());
         // TODO: still needs refactoring (end)
 
