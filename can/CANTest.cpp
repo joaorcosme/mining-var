@@ -1,12 +1,16 @@
-#include <cerrno>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/poll.h>
 
+#include <cassert>
+#include <cerrno>
+
 #include <chrono>
 #include <future>
+#include <iomanip>
 #include <iostream>
+#include <string>
 #include <thread>
 
 #include "CANproChannel.h"
@@ -16,104 +20,34 @@
     if (0)                                                                     \
     std::cout << "#DEBUG: Interruption Thread :::: " << MSG << std::endl
 
-// for time stamp calculation ...
-__u32 Time, diff_time, old_time;
+constexpr char hexMap[] = {'0', '1', '2', '3', '4', '5', '6', '7',
+                           '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
 
-static char *FormatData(char *buffer, unsigned char *pData, long dataLen) {
-    memset(buffer, 0, 25);
-
-    for (int i = 0; i < 8; ++i) {
-        if (i < dataLen) {
-            sprintf(&buffer[i * 3], "%3x", pData[i]);
-        } else {
-            strcat(buffer, "   ");
-        }
+static std::string hexStr(const __u8 *data, const __s32 len) {
+    std::string hexData(24, ' ');
+    for (unsigned i = 0; i < len; ++i) {
+        hexData[3 * i] = hexMap[(data[i] & 0xF0) >> 4];
+        hexData[3 * i + 1] = hexMap[data[i] & 0x0F];
     }
-
-    return buffer;
+    return hexData;
 }
 
-static int readBusEvent(CAN_HANDLE can) {
-    char buffer[25];
-
-    PARAM_STRUCT param;
-    param.DataLength = 3;
-
-    int frc = CANL2_read_ac(can, &param);
-    switch (frc) {
-    case CANL2_RA_DATAFRAME:
-
-        diff_time = param.Time - old_time;
-        printf("RCV STD CAN%u Id%8x Dlc%u Data%s T%8x D%10lu\n", 1, param.Ident,
-               param.DataLength,
-               FormatData(buffer, param.RCV_data, param.DataLength), param.Time,
-               diff_time);
-        old_time = param.Time;
-
-        break;
-    case CANL2_RA_REMOTEFRAME:
-        diff_time = param.Time - old_time;
-        printf("RCV STD CAN%u Id%8x Dlc%u REMOTE                       "
-               "T%8x D%10lu\n",
-               1, param.Ident, param.DataLength, param.Time, diff_time);
-        old_time = param.Time;
-        break;
-    case CANL2_RA_XTD_DATAFRAME: // not valid with AC2 with 82C200
-        diff_time = param.Time - old_time;
-        printf("RCV XTD CAN%u Id%8x Dlc%u Data%s T%8x D%10lu\n", 1, param.Ident,
-               param.DataLength,
-               FormatData(buffer, param.RCV_data, param.DataLength), param.Time,
-               diff_time);
-        old_time = param.Time;
-        break;
-    case CANL2_RA_XTD_REMOTEFRAME: // not valid with AC2 with 82C200
-        diff_time = param.Time - old_time;
-        printf("RCV XTD CAN%u Id%8x Dlc%u REMOTE                       "
-               "T%8x D%10lu\n",
-               1, param.Ident, param.DataLength, param.Time, diff_time);
-        old_time = param.Time;
-        break;
-    case CANL2_RA_TX_DATAFRAME:
-        diff_time = param.Time - old_time;
-
-        printf("ACK STD CAN%u Id%8x Dlc%u Data%s T%8x D%10lu\n", 1, param.Ident,
-               param.DataLength,
-               FormatData(buffer, param.RCV_data, param.DataLength), param.Time,
-               diff_time);
-        old_time = param.Time;
-        break;
-    case CANL2_RA_TX_REMOTEFRAME:
-        diff_time = param.Time - old_time;
-        printf("ACK STD CAN%u Id%8x Dlc%u REMOTE                       "
-               "T%8x D%10lu\n",
-               1, param.Ident, param.DataLength, param.Time, diff_time);
-        old_time = param.Time;
-        break;
-    case CANL2_RA_XTD_TX_DATAFRAME: // not valid with AC2 with 82C200
-        diff_time = param.Time - old_time;
-        printf("ACK XTD CAN%u Id%8x Dlc%u Data%s T%8x D%10lu\n", 1, param.Ident,
-               param.DataLength,
-               FormatData(buffer, param.RCV_data, param.DataLength), param.Time,
-               diff_time);
-        old_time = param.Time;
-        break;
-    case CANL2_RA_XTD_TX_REMOTEFRAME: // not valid with AC2 with 82C200
-        diff_time = param.Time - old_time;
-        printf("ACK XTD CAN%u Id%8x Dlc%u REMOTE                       "
-               "T%8x D%10lu\n",
-               1, param.Ident, param.DataLength, param.Time, diff_time);
-        old_time = param.Time;
-        break;
-    case CANL2_RA_CHG_BUS_STATE:
-        diff_time = param.Time - old_time;
-        printf("ERROR  CAN%u Bus state: %1d                      T%8x D%10lu\n",
-               1, param.Bus_state, param.Time, diff_time);
-        old_time = param.Time;
-        break;
-    default:
-        break;
+static void printReceivedData(int frc, const PARAM_STRUCT &param) {
+    // for now, we are only interested in this type of frame
+    if (frc == CANL2_RA_DATAFRAME) {
+        std::cout << "RCV STD CAN1 :::: "
+                  << "ID " << std::hex << std::setfill(' ') << std::setw(5)
+                  << param.Ident << " :: LEN " << param.DataLength
+                  << " :: DATA " << hexStr(param.RCV_data, param.DataLength)
+                  << std::endl;
+    } else {
+        assert(false);
     }
-    return frc;
+}
+
+static int readBusEvent(CAN_HANDLE can, PARAM_STRUCT &retParam) {
+    retParam.DataLength = 3;
+    return CANL2_read_ac(can, &retParam);
 }
 
 static bool shouldTerminate(const std::future<void> &signal) {
@@ -148,10 +82,12 @@ static void interruption(CAN_HANDLE channel, std::future<void> futureSignal) {
 
         DEBUG_INTERRUPTION("Read section");
         // desciptor is ready to be read
-        while ((ret = readBusEvent(channel))) {
+        PARAM_STRUCT outParam;
+        while ((ret = readBusEvent(channel, outParam))) {
             if (ret < 0 || shouldTerminate(futureSignal)) {
                 goto endthread;
             }
+            printReceivedData(ret, outParam);
         }
     }
 

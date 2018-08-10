@@ -75,7 +75,7 @@ void CANproChannel::queryChannel() {
 
 void CANproChannel::initializeChannel() {
     std::string name((char *)m_pChannel->ChannelName);
-    std::cout << "#INFO: Initializing channel " << name << std::endl;
+    std::cout << "#INFO: Initializing channel \"" << name << "\"." << std::endl;
 
     CANL2_CH_STRUCT channel;
     name.copy((char *)channel.sChannelName, name.length());
