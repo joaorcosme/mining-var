@@ -4,21 +4,30 @@
 #include <iostream>
 #include <string>
 
+using can::CANproChannel;
+
 static std::string getDriverErrorMsg(const int code) {
     return "The driver reported a problem. Error Code: " + std::to_string(code);
 }
 
 CANproChannel::CANproChannel() {
     try {
-
         queryChannel();
         printChannelInfo();
         initializeChannel();
         setFifoMode();
 
+        std::cout << "#INFO: The CANpro channel is now online." << std::endl;
     } catch (...) {
         throw;
     }
+}
+
+CANproChannel::~CANproChannel() {
+    std::cout << "#INFO: Closing CANpro channel." << std::endl;
+    INIL2_close_channel(m_handle);
+
+    delete m_pChannel;
 }
 
 void CANproChannel::queryChannel() {
@@ -45,7 +54,7 @@ void CANproChannel::queryChannel() {
     assert(nChannels == 1);
     assert(neededBufferSize == sizeof(*m_pChannel));
 
-    const __u32 providedBufferSize = neededBufferSize;
+    const auto providedBufferSize = neededBufferSize;
 
     // now call the function with a valid buffer size and pointer to channel
     retCode = CANL2_get_all_CAN_channels(providedBufferSize, &neededBufferSize,

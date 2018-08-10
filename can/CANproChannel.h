@@ -3,13 +3,15 @@
 
 #include "canL2.h"
 
+namespace can {
+
 class CANproChannel {
   public:
     CANproChannel &operator=(const CANproChannel) = delete;
     CANproChannel(const CANproChannel &) = delete;
 
     CANproChannel();
-    ~CANproChannel() { delete m_pChannel; }
+    ~CANproChannel();
 
     void printChannelInfo() const;
     CAN_HANDLE getHandle() const { return m_handle; }
@@ -25,5 +27,7 @@ class CANproChannel {
     L2CONFIG m_l2Config;
     CHDSNAPSHOT* m_pChannel{new CHDSNAPSHOT};
 };
+
+} // namespace can
 
 #endif // __CAN_PRO_CHANNEL_H_
