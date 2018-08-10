@@ -1,7 +1,7 @@
 #ifndef __CAN_PRO_CHANNEL_H_
 #define __CAN_PRO_CHANNEL_H_
 
-#include "canL2.h"
+#include "CANL2.h"
 
 namespace can {
 
