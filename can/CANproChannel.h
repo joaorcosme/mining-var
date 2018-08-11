@@ -1,5 +1,5 @@
-#ifndef __CAN_PRO_CHANNEL_H_
-#define __CAN_PRO_CHANNEL_H_
+#ifndef _CAN_PRO_CHANNEL_H_
+#define _CAN_PRO_CHANNEL_H_
 
 #include "CANL2.h"
 
@@ -30,4 +30,4 @@ class CANproChannel {
 
 } // namespace can
 
-#endif // __CAN_PRO_CHANNEL_H_
+#endif // _CAN_PRO_CHANNEL_H_

@@ -1,3 +1,4 @@
+#include "BacksenseCANFrame.h"
 #include "CANL2.h"
 #include "CANproChannel.h"
 #include "CANUtils.h"
