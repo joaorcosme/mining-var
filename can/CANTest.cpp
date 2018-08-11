@@ -1,20 +1,15 @@
 #include "CANL2.h"
-#include "CANUtils.h"
 #include "CANproChannel.h"
+#include "CANUtils.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <sys/poll.h>
 
-#include <cassert>
 #include <cerrno>
+#include <cstring>
 
 #include <chrono>
 #include <future>
-#include <iomanip>
 #include <iostream>
-#include <string>
 #include <thread>
 
 #define DEBUG_INTERRUPTION(MSG)                                                \
@@ -49,7 +44,7 @@ static void interruption(CAN_HANDLE channel, std::future<void> futureSignal) {
                 goto endthread;
             }
             if ((ret == -1) && (errno != EINTR)) {
-                std::cerr << "#Error: poll() [" << strerror(errno) << "]";
+                std::cerr << "#Error: poll() [" << std::strerror(errno) << "]";
             }
         }
 

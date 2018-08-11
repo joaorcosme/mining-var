@@ -2,7 +2,7 @@ CFLAGS=-g -Wall -lpthread -std=c++14
 PRG=test
 OBJS=CANTest.o CANproChannel.o CANUtils.o
 
-all: $(PRG)
+all: $(PRG) tags
 
 $(PRG): $(OBJS)
 	g++-6 -o $@ $^ $(CFLAGS) -L/usr/local/lib -lSoftingCan
@@ -16,7 +16,10 @@ CANproChannel.o : CANproChannel.cpp
 CANUtils.o : CANUtils.cpp
 	g++-6 -c $^
 
-.PHONY: clean
+.PHONY: clean tags
+
+tags:
+	ctags -R --languages=c++
 
 clean:
 	rm -f $(OBJS) $(PRG) *~
