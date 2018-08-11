@@ -1,4 +1,4 @@
-CFLAGS=-g -Wall -lpthread -std=c++14
+CFLAGS=-g -Wall -lpthread -std=c++17
 PRG=test
 OBJS=CANTest.o CANproChannel.o CANUtils.o
 

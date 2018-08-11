@@ -12,6 +12,7 @@
 #include <future>
 #include <iostream>
 #include <thread>
+#include <utility>
 
 #define DEBUG_INTERRUPTION(MSG)                                                \
     if (0)                                                                     \
@@ -28,6 +29,9 @@ static void interruption(CAN_HANDLE channel, std::future<void> futureSignal) {
     DEBUG_INTERRUPTION("Thread start");
 
     struct pollfd can_poll;
+
+    backsense::RadarStateDB stateDB;
+    backsense::FrameHandler frameHandler;
 
     while (!shouldTerminate(futureSignal)) {
 
@@ -56,7 +60,15 @@ static void interruption(CAN_HANDLE channel, std::future<void> futureSignal) {
             if (ret < 0 || shouldTerminate(futureSignal)) {
                 goto endthread;
             }
+
             CANUtils::printReceivedData(ret, outParam);
+
+            auto state = frameHandler.processRcvFrame(outParam);
+            if (state) {
+                stateDB.updateState(std::move(*state));
+            }
+
+            std::cout << "db size: " << stateDB.size() << std::endl;
         }
     }
 
