@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <array>
 #include <experimental/optional>
+#include <iostream>
 #include <set>
 #include <unordered_set>
 
@@ -26,16 +27,24 @@ class DetectionData {
     DetectionData(const DetectionData &other) = default;
     DetectionData &operator=(const DetectionData &) = default;
 
-  public:
-    __u32 getId() const { return m_detectionId; }
-
     bool operator<(const DetectionData &other) const {
         return m_detectionId < other.getId();
     }
 
-    double getPolarRadius() const {
-        return converter::PolarRadius().convert(m_frame);
-    }
+    __u32 getId() const { return m_detectionId; }
+
+    double getPolarRadius() const;
+    int getPolarAngle() const;
+    double getX() const;
+    double getY() const;
+    double getRelativeSpeed() const;
+    int getSignalPower() const;
+    int getObjectId() const;
+    int getObjectAppearanceStatus() const;
+    int getTriggerEvent() const;
+    int getDetectionFlag() const;
+
+    void dump(std::ostream& out) const;
 
   private:
     explicit DetectionData(const __u8 *data, const __u32 detectionId)

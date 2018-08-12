@@ -20,11 +20,12 @@ template <typename PhyT> class DetectionDataConverter {
     PhyT convert(const std::array<__u8, N_BYTES> &frame) {
         __u8 byte = frame[byteNumber()];
 
-        assert(byte >= minRawValue() && byte <= maxRawValue());
+        // assert(byte >= minRawValue() && byte <= maxRawValue());
 
         if (dataLength() != N_BITS) {
             byte >>= startBit();
-            byte <<= (N_BITS - dataLength() - startBit());
+            byte <<= (N_BITS - dataLength());
+            byte >>= (N_BITS - dataLength());
         }
 
         PhyT value = byte * resolution() + offset();
@@ -32,13 +33,13 @@ template <typename PhyT> class DetectionDataConverter {
 
   protected:
     virtual unsigned byteNumber() const = 0;
+    virtual PhyT resolution() const = 0;
 
-    virtual PhyT resolution() const { return static_cast<PhyT>(1); };
     virtual int offset() const { return 0; }
     virtual unsigned dataLength() const { return N_BITS; }
     virtual unsigned startBit() const { return 0; }
-    virtual __u8 minRawValue() const  { return 0x0; }
-    virtual __u8 maxRawValue() const { return 0x0; }
+    virtual __u8 minRawValue() const { return 0x0; }
+    virtual __u8 maxRawValue() const { return 0xFF; }
 };
 
 class PolarRadius : public DetectionDataConverter<double> {
@@ -52,13 +53,14 @@ class PolarRadius : public DetectionDataConverter<double> {
     __u8 maxRawValue() const override { return 0x79; }
 };
 
-class PolarAngle : public DetectionDataConverter<double> {
+class PolarAngle : public DetectionDataConverter<int> {
   public:
     PolarAngle() = default;
 
   private:
     unsigned byteNumber() const override { return 1; }
     int offset() const override { return -128; }
+    int resolution() const override { return 1; }
     __u8 minRawValue() const override { return 0x44; }
     __u8 maxRawValue() const override { return 0xBC; }
 };
@@ -98,17 +100,18 @@ class RelativeSpeed : public DetectionDataConverter<double> {
     __u8 maxRawValue() const override { return 0xFF; }
 };
 
-class SignalPower : public DetectionDataConverter<double> {
+class SignalPower : public DetectionDataConverter<int> {
   public:
     SignalPower() = default;
 
   private:
     unsigned byteNumber() const override { return 5; }
+    int resolution() const override { return 1; }
     __u8 minRawValue() const override { return 0x0; }
     __u8 maxRawValue() const override { return 0x7F; }
 };
 
-class ObjectId : public DetectionDataConverter<double> {
+class ObjectId : public DetectionDataConverter<int> {
   public:
     ObjectId() = default;
 
@@ -116,9 +119,10 @@ class ObjectId : public DetectionDataConverter<double> {
     unsigned byteNumber() const override { return 6; }
     unsigned startBit() const override { return 5; }
     unsigned dataLength() const override { return 3; }
+    int resolution() const override { return 1; }
 };
 
-class ObjectAppearanceStatus : public DetectionDataConverter<double> {
+class ObjectAppearanceStatus : public DetectionDataConverter<int> {
   public:
     ObjectAppearanceStatus() = default;
 
@@ -126,9 +130,10 @@ class ObjectAppearanceStatus : public DetectionDataConverter<double> {
     unsigned byteNumber() const override { return 6; }
     unsigned startBit() const override { return 4; }
     unsigned dataLength() const override { return 1; }
+    int resolution() const override { return 1; }
 };
 
-class TriggerEvent : public DetectionDataConverter<double> {
+class TriggerEvent : public DetectionDataConverter<int> {
   public:
     TriggerEvent() = default;
 
@@ -136,15 +141,17 @@ class TriggerEvent : public DetectionDataConverter<double> {
     unsigned byteNumber() const override { return 6; }
     unsigned startBit() const override { return 1; }
     unsigned dataLength() const override { return 2; }
+    int resolution() const override { return 1; }
 };
 
-class DetectionFlag : public DetectionDataConverter<double> {
+class DetectionFlag : public DetectionDataConverter<int> {
   public:
     DetectionFlag() = default;
 
   private:
     unsigned byteNumber() const override { return 7; }
     unsigned dataLength() const override { return 1; }
+    int resolution() const override { return 1; }
     __u8 minRawValue() const override { return 0x0; }
     __u8 maxRawValue() const override { return 0x1; }
 };

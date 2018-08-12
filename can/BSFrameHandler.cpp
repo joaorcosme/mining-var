@@ -34,6 +34,61 @@ void FrameHandler::initializeDetectionIds() {
     }
 }
 
+// :::: class DetectionData
+
+double DetectionData::getPolarRadius() const {
+    return converter::PolarRadius().convert(m_frame);
+}
+
+int DetectionData::getPolarAngle() const {
+    return converter::PolarAngle().convert(m_frame);
+}
+
+double DetectionData::getX() const { return converter::X().convert(m_frame); }
+
+double DetectionData::getY() const { return converter::Y().convert(m_frame); }
+
+double DetectionData::getRelativeSpeed() const {
+    return converter::RelativeSpeed().convert(m_frame);
+}
+
+int DetectionData::getSignalPower() const {
+    return converter::SignalPower().convert(m_frame);
+}
+
+int DetectionData::getObjectId() const {
+    return converter::ObjectId().convert(m_frame);
+}
+
+int DetectionData::getObjectAppearanceStatus() const {
+    return converter::ObjectAppearanceStatus().convert(m_frame);
+}
+
+int DetectionData::getTriggerEvent() const {
+    return converter::TriggerEvent().convert(m_frame);
+}
+
+int DetectionData::getDetectionFlag() const {
+    return converter::DetectionFlag().convert(m_frame);
+}
+
+void DetectionData::dump(std::ostream &out) const {
+    auto objid = getObjectId();
+    auto appea = getObjectAppearanceStatus();
+    auto trigg = getTriggerEvent();
+    auto detec = getDetectionFlag();
+    out << "Id: " << std::hex << getId() << std::dec
+        << "\nPolar Radius: " << getPolarRadius()
+        << "\nPolar Angle: " << getPolarAngle() << "\nX: " << getX()
+        << "\nY: " << getY() << "\nRelative Speed: " << getRelativeSpeed()
+        << "\nSignal Power: " << getSignalPower()
+        << "\nObject Id: " << getObjectId()
+        << "\nObject Appearance: " << getObjectAppearanceStatus()
+        << "\nTrigger Event: " << getTriggerEvent()
+        << "\nDetection Flag: " << getDetectionFlag()
+        << "\n----------------------------------------" << std::endl;
+}
+
 // :::: class RadarStateDB
 
 using can::backsense::RadarStateDB;

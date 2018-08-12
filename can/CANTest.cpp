@@ -13,8 +13,10 @@
 #include <functional>
 #include <future>
 #include <iostream>
+#include <sstream>
 #include <thread>
 #include <utility>
+
 
 #define DEBUG_INTERRUPTION(MSG)                                                \
     if (0)                                                                     \
@@ -67,10 +69,12 @@ static void interruption(CAN_HANDLE channel, backsense::RadarStateDB &stateDB,
 
             auto state = frameHandler.processRcvFrame(outParam);
             if (state) {
+                std::ostringstream ss;
+                state->dump(ss);
+                std::cout << ss.str();
                 stateDB.updateState(std::move(*state));
             }
 
-            std::cout << "db size: " << stateDB.size() << std::endl;
         }
     }
 
