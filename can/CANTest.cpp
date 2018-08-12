@@ -1,7 +1,7 @@
-#include "BacksenseCANFrame.h"
+#include "BSFrameHandler.h"
 #include "CANL2.h"
-#include "CANproChannel.h"
 #include "CANUtils.h"
+#include "CANproChannel.h"
 
 #include <sys/poll.h>
 
@@ -9,6 +9,8 @@
 #include <cstring>
 
 #include <chrono>
+#include <experimental/optional>
+#include <functional>
 #include <future>
 #include <iostream>
 #include <thread>
@@ -25,12 +27,12 @@ static bool shouldTerminate(const std::future<void> &signal) {
 
 namespace can {
 
-static void interruption(CAN_HANDLE channel, std::future<void> futureSignal) {
+static void interruption(CAN_HANDLE channel, backsense::RadarStateDB &stateDB,
+                         std::future<void> futureSignal) {
     DEBUG_INTERRUPTION("Thread start");
 
     struct pollfd can_poll;
 
-    backsense::RadarStateDB stateDB;
     backsense::FrameHandler frameHandler;
 
     while (!shouldTerminate(futureSignal)) {
@@ -79,14 +81,15 @@ endthread:
 
 } // namespace can
 
-
 int main(int argc, char **argv) {
 
     try {
         can::CANproChannel channel;
+        can::backsense::RadarStateDB stateDB;
         std::promise<void> exitSignal;
         std::future<void> futureSignal = exitSignal.get_future();
         std::thread interruptionHandler(can::interruption, channel.getHandle(),
+                                        std::ref(stateDB),
                                         std::move(futureSignal));
         std::getchar();
 
