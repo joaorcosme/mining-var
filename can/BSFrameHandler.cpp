@@ -1,6 +1,6 @@
 #include "BSFrameHandler.h"
 
-#include <cassert>
+#include <sstream>
 #include <utility>
 
 // :::: class FrameHandler
@@ -45,6 +45,12 @@ void FrameHandler::initializeDetectionIds() {
 }
 
 // :::: class DetectionData
+
+std::string DetectionData::getStrHexId() const {
+    std::stringstream ss;
+    ss << std::hex << "0x" << m_detectionId;
+    return ss.str();
+}
 
 double DetectionData::getPolarRadius() const {
     return converter::PolarRadius().convert(m_frame);
@@ -109,6 +115,12 @@ void RadarStateDB::updateState(const DetectionData &&newState) {
     auto id = newState.getId();
     auto idxPair = FrameHandler::getIndexPairFromId(id);
     m_db[idxPair.first][idxPair.second] = OptDetectionData(newState);
+}
+
+const std::vector<std::experimental::optional<DetectionData>> &
+RadarStateDB::getSensorData(unsigned sensorIdx) {
+    assert(sensorIdx < m_db.size());
+    return m_db[sensorIdx];
 }
 
 void RadarStateDB::autoClear() {

@@ -11,7 +11,6 @@
 #include <array>
 #include <experimental/optional>
 #include <iostream>
-#include <sstream>
 #include <unordered_map>
 #include <vector>
 
@@ -30,7 +29,7 @@ class DetectionData {
     DetectionData &operator=(const DetectionData &) = default;
 
     __u32 getId() const { return m_detectionId; }
-    std::string getStrHexId() const { return m_strHexId; }
+    std::string getStrHexId() const;
 
     double getPolarRadius() const;
     int getPolarAngle() const;
@@ -49,10 +48,6 @@ class DetectionData {
     explicit DetectionData(const __u8 *data, const __u32 detectionId)
         : m_detectionId(detectionId) {
         std::copy(data, data + N_BYTES, m_frame.begin());
-
-        std::stringstream ss;
-        ss << std::hex << "0x" << m_detectionId;
-        m_strHexId = ss.str();
     }
 
     // only the frame handler should build frames directly
@@ -61,7 +56,6 @@ class DetectionData {
   private:
     std::array<__u8, N_BYTES> m_frame;
     __u32 m_detectionId;
-    std::string m_strHexId;
 };
 
 using OptDetectionData = std::experimental::optional<DetectionData>;
@@ -100,10 +94,7 @@ class RadarStateDB {
 
     void updateState(const DetectionData &&newState);
 
-    const DetectionDataVec& getSensorData(unsigned sensorIdx) {
-        assert(sensorIdx < m_db.size());
-        return m_db[sensorIdx];
-    }
+    const DetectionDataVec& getSensorData(unsigned sensorIdx);
 
   private:
     void autoClear();
