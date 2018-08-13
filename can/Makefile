@@ -1,11 +1,11 @@
-CFLAGS=-g -Wall -lpthread -std=c++17
+CFLAGS=-g -Wall -std=c++17
 PRG=test
 OBJS=BSFrameHandler.o CANproChannel.o CANUtils.o CANTest.o
 
 all: $(PRG) tags
 
 $(PRG): $(OBJS)
-	g++-6 -o $@ $^ $(CFLAGS) -L/usr/local/lib -lSoftingCan
+	g++-6 -o $@ $^ $(CFLAGS) -I/usr/local/include -L/usr/local/lib -lSoftingCan -lnana -lstdc++fs -lX11 -lpthread -lrt -lXft -lpng -lasound -lfontconfig
 
 BSFrameHandler.o : BSFrameHandler.cpp
 	g++-6 -c $^

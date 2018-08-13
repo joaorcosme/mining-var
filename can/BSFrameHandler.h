@@ -4,14 +4,16 @@
 #include "BSDataConverter.h"
 #include "CANL2.h" // PARAM_STRUCT
 
+#include <cassert>
 #include <linux/types.h>
 
 #include <algorithm>
 #include <array>
 #include <experimental/optional>
 #include <iostream>
-#include <set>
-#include <unordered_set>
+#include <sstream>
+#include <unordered_map>
+#include <vector>
 
 namespace can {
 
@@ -27,11 +29,8 @@ class DetectionData {
     DetectionData(const DetectionData &other) = default;
     DetectionData &operator=(const DetectionData &) = default;
 
-    bool operator<(const DetectionData &other) const {
-        return m_detectionId < other.getId();
-    }
-
     __u32 getId() const { return m_detectionId; }
+    std::string getStrHexId() const { return m_strHexId; }
 
     double getPolarRadius() const;
     int getPolarAngle() const;
@@ -44,21 +43,28 @@ class DetectionData {
     int getTriggerEvent() const;
     int getDetectionFlag() const;
 
-    void dump(std::ostream& out) const;
+    void dump(std::ostream &out) const;
 
   private:
     explicit DetectionData(const __u8 *data, const __u32 detectionId)
         : m_detectionId(detectionId) {
         std::copy(data, data + N_BYTES, m_frame.begin());
+
+        std::stringstream ss;
+        ss << std::hex << "0x" << m_detectionId;
+        m_strHexId = ss.str();
     }
 
     // only the frame handler should build frames directly
     friend FrameHandler;
 
   private:
-    mutable std::array<__u8, N_BYTES> m_frame;
+    std::array<__u8, N_BYTES> m_frame;
     __u32 m_detectionId;
+    std::string m_strHexId;
 };
+
+using OptDetectionData = std::experimental::optional<DetectionData>;
 
 class FrameHandler {
   public:
@@ -67,8 +73,9 @@ class FrameHandler {
 
     FrameHandler() { initializeDetectionIds(); }
 
-    std::experimental::optional<DetectionData>
-    processRcvFrame(const PARAM_STRUCT &frame);
+    OptDetectionData processRcvFrame(const PARAM_STRUCT &frame);
+
+    static std::pair<unsigned, unsigned> getIndexPairFromId(const __u32 id);
 
   private:
     bool isDetectionObjectId(const __u32 id) const;
@@ -76,21 +83,33 @@ class FrameHandler {
     void initializeDetectionIds();
 
   private:
-    std::unordered_set<__u32> m_detectionIds;
+    // key: frame id --> value: pair of <sensor idx, obj idx>
+    static std::unordered_map<__u32, std::pair<unsigned, unsigned>>
+        s_detectionIdsToIndexes;
 };
+
+using DetectionDataVec = std::vector<OptDetectionData>;
+using std::experimental::nullopt;
 
 class RadarStateDB {
   public:
-    RadarStateDB() = default;
+    RadarStateDB(unsigned nSensors) {
+        assert(nSensors <= MAX_N_SENSORS);
+        m_db.assign(nSensors, DetectionDataVec(MAX_N_OBJS, nullopt));
+    }
 
     void updateState(const DetectionData &&newState);
-    auto size() const { return m_db.size(); }
+
+    const DetectionDataVec& getSensorData(unsigned sensorIdx) {
+        assert(sensorIdx < m_db.size());
+        return m_db[sensorIdx];
+    }
 
   private:
     void autoClear();
 
   private:
-    std::set<DetectionData> m_db;
+    std::vector<DetectionDataVec> m_db;
     unsigned m_callCount = 0;
 };
 
