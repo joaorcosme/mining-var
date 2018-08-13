@@ -26,73 +26,77 @@ extern "C" {
 
 // Softing CAN Device Type
 typedef enum {
-    CANCARDNEC = 1,
-    CANCARDSJA = 4,
-    CANCARD2,
-    CANPCI = 7,
-    CANPCIDN,
-    CAN_104,
-    CANUSB,
-    CAN104ECO = 12,
-    CANPROPCIE,
-    CAN104PLUS,
-    CANPROUSB,
-    EDICCARDC = 0x101,
-    EDICCARD2 = 0x105,
-    GEFANUCPC8 = 0x8000,
-    FG100CAN = 0x10000000L
+  CANCARDNEC = 1,
+  CANCARDSJA = 4,
+  CANCARD2,
+  CANPCI = 7,
+  CANPCIDN,
+  CAN_104,
+  CANUSB,
+  CAN104ECO = 12,
+  CANPROPCIE,
+  CAN104PLUS,
+  CANPROUSB,
+  EDICCARDC = 0x101,
+  EDICCARD2 = 0x105,
+  GEFANUCPC8 = 0x8000,
+  FG100CAN = 0x10000000L
 } DEVICETYPE;
 
 #pragma pack(1) // pack alignment must be one
 
 #ifndef CANL2_EXPORTS
 #define MAXLENCHNAME 80
-typedef struct {
-    __u32 u32Serial;     // serial number
-    __u32 u32DeviceType; // device type
-    __u32 u32PhysCh;     // physical channel number (1 or 2)
-    __u32 u32FwId;       // id of the loaded firmware
-    int bIsOpen;         // TRUE if opened by a process
-    unsigned char ChannelName[MAXLENCHNAME];
+typedef struct
+{
+  __u32 u32Serial;     // serial number
+  __u32 u32DeviceType; // device type
+  __u32 u32PhysCh;     // physical channel number (1 or 2)
+  __u32 u32FwId;       // id of the loaded firmware
+  int bIsOpen;         // TRUE if opened by a process
+  unsigned char ChannelName[MAXLENCHNAME];
 
 } CHDSNAPSHOT, *PCHDSNAPSHOT;
 #endif
 
-typedef struct canl2_ch_s {
-    CAN_HANDLE ulChannelHandle;
-    __u8 sChannelName[80];
+typedef struct canl2_ch_s
+{
+  CAN_HANDLE ulChannelHandle;
+  __u8 sChannelName[80];
 } CANL2_CH_STRUCT;
 
-typedef struct {
-    __u32 Ident;
-    __s32 DataLength;
-    __s32 RecOverrun_flag;
-    __s32 RCV_fifo_lost_msg;
-    __u8 RCV_data[8];
-    __s32 AckOverrun_flag;
-    __s32 XMT_ack_fifo_lost_acks;
-    __s32 XMT_rmt_fifo_lost_remotes;
-    __s32 Bus_state;
-    __s32 Error_state;
-    CAN_HANDLE Can;
-    __u32 Time;
+typedef struct
+{
+  __u32 Ident;
+  __s32 DataLength;
+  __s32 RecOverrun_flag;
+  __s32 RCV_fifo_lost_msg;
+  __u8 RCV_data[8];
+  __s32 AckOverrun_flag;
+  __s32 XMT_ack_fifo_lost_acks;
+  __s32 XMT_rmt_fifo_lost_remotes;
+  __s32 Bus_state;
+  __s32 Error_state;
+  CAN_HANDLE Can;
+  __u32 Time;
 } PARAM_STRUCT;
 
-typedef struct {
-    double fBaudrate;
-    __s32 s32Prescaler;
-    __s32 s32Tseg1;
-    __s32 s32Tseg2;
-    __s32 s32Sjw;
-    __s32 s32Sam;
-    __s32 s32AccCodeStd;
-    __s32 s32AccMaskStd;
-    __s32 s32AccCodeXtd;
-    __s32 s32AccMaskXtd;
-    __s32 s32OutputCtrl;
-    __s8 bEnableAck;
-    __s8 bEnableErrorframe;
-    unsigned long hEvent;
+typedef struct
+{
+  double fBaudrate;
+  __s32 s32Prescaler;
+  __s32 s32Tseg1;
+  __s32 s32Tseg2;
+  __s32 s32Sjw;
+  __s32 s32Sam;
+  __s32 s32AccCodeStd;
+  __s32 s32AccMaskStd;
+  __s32 s32AccCodeXtd;
+  __s32 s32AccMaskXtd;
+  __s32 s32OutputCtrl;
+  __s8 bEnableAck;
+  __s8 bEnableErrorframe;
+  unsigned long hEvent;
 } L2CONFIG;
 
 #define INIPC_IB_ERR_VC_IOCANCELLED 0xFE05 // driver call cancelled
@@ -131,7 +135,7 @@ typedef struct {
 #define VCARD_ERROR_BASE (0x000A0000)
 
 #define MK_VCARD_ERROR_CODE(VCARD_ERROR)                                       \
-    ((VCARD_ERROR) ? (VCARD_ERROR_BASE | ERROR_BASE | VCARD_ERROR) : 0)
+  ((VCARD_ERROR) ? (VCARD_ERROR_BASE | ERROR_BASE | VCARD_ERROR) : 0)
 
 //  VCARD ERROR CODES (Error codes from kernelmode driver)
 #ifndef CANL2_EXPORTS
@@ -145,85 +149,85 @@ typedef struct {
 #define VCARD_ILLEGALCALL (__u32)0xE00A0006   // illegal driver call
 #define VCARD_NOTSUPPORTED (__u32)0xE00A0007  // not implemented
 #define VCARD_VERSIONERROR                                                     \
-    (__u32)0xE00A0008 // driver interface dll has the wrong version
+  (__u32)0xE00A0008 // driver interface dll has the wrong version
 #define VCARD_DRIVERVERSIONERROR (__u32)0xE00A0009 // wrong driver version
 #define VCARD_DRIVERNOTFOUND                                                   \
-    (__u32)0xE00A000A // driver not loaded / not installed, or device is not
-                      // plugged
+  (__u32)0xE00A000A // driver not loaded / not installed, or device is not
+                    // plugged
 #define VCARD_NOTENOUGHMEMORY (__u32)0xE00A000B // out of memory
 #define VCARD_TOOMANYDEVICES                                                   \
-    (__u32)0xE00A000C // driver can not handle as much devices
+  (__u32)0xE00A000C // driver can not handle as much devices
 #define VCARD_UNKNOWNDEVICE (__u32)0xE00A000D       // unknown device
 #define VCARD_DEVICEALREADYEXISTS (__u32)0xE00A000E // device already exists
 #define VCARD_DEVICEACCESSERROR                                                \
-    (__u32)0xE00A000F // access is not possible: device is already open
+  (__u32)0xE00A000F // access is not possible: device is already open
 #define VCARD_RESOURCEALREADYREGISTERED                                        \
-    (__u32)0xE00A0010 // resource is in use by an other device
+  (__u32)0xE00A0010 // resource is in use by an other device
 #define VCARD_RESOURCECONFLICT (__u32)0xE00A0011 // resource conflict
 #define VCARD_RESOURCEACCESSERROR                                              \
-    (__u32)0xE00A0012 // resource can not be accessed
+  (__u32)0xE00A0012 // resource can not be accessed
 #define VCARD_PHYSMEMORYOVERRUN                                                \
-    (__u32)0xE00A0013 // ungueltiger Zugriff auf physikalischen Speicher
+  (__u32)0xE00A0013 // ungueltiger Zugriff auf physikalischen Speicher
 #define VCARD_TOOMANYPORTS (__u32)0xE00A0014 // zu viele I/O Ports 20
 #define VCARD_INTERRUPTERROR                                                   \
-    (__u32)0xE00A0015 // error while activating the interrupt
+  (__u32)0xE00A0015 // error while activating the interrupt
 #define VCARD_UNKNOWNRESOURCE (__u32)0xE00A0016 // unknown ressorce
 #define VCARD_CREATEDEVFAILED (__u32)0xE00A0017 // IoCreateDevice failed
 #define VCARD_ATTACHTODEVSTACKFAILED                                           \
-    (__u32)0xE00A0018 // IoAttachDeviceToDeviceStack failed
+  (__u32)0xE00A0018 // IoAttachDeviceToDeviceStack failed
 #define VCARD_SYMBOLICLINKFAILED                                               \
-    (__u32)0xE00A0019 // failed to create a symbolic link
+  (__u32)0xE00A0019 // failed to create a symbolic link
 
 //    Errors which can occur while downloading the firmware
 #define VCARD_NOCARDSERVICES                                                   \
-    (__u32)0xE00A001A // can not access card services under Win '98
+  (__u32)0xE00A001A // can not access card services under Win '98
 #define VCARD_CARDSERVICESVERSION                                              \
-    (__u32)0xE00A001B // wrong version of the card services under Win '98
+  (__u32)0xE00A001B // wrong version of the card services under Win '98
 #define VCARD_CARDSERVICESGETINFO                                              \
-    (__u32)0xE00A001C // error while accessing the card services under Win '98
+  (__u32)0xE00A001C // error while accessing the card services under Win '98
 #define VCARD_DEVICENOTFOUND (__u32)0xE00A001D // device not found.
 #define VCARD_NODPRAM                                                          \
-    (__u32)0xE00A001E // can not get a free address region for DPRAM from
-                      // system
+  (__u32)0xE00A001E // can not get a free address region for DPRAM from
+                    // system
 #define VCARD_CONTROLHWERROR (__u32)0xE00A001F // Error while accessing hardware
 #define VCARD_SBNCHECKSUM                                                      \
-    (__u32)0xE00A0020 // Checksum error in SBN format (dll binary may be
-                      // corrupt)
+  (__u32)0xE00A0020 // Checksum error in SBN format (dll binary may be
+                    // corrupt)
 #define VCARD_DPRAMACCESS (__u32)0xE00A0021 // can not access the DPRAM memory
 #define VCARD_CARDREACTION                                                     \
-    (__u32)0xE00A0022 // Loader program for firmware download does no more
-                      // react.
+  (__u32)0xE00A0022 // Loader program for firmware download does no more
+                    // react.
 #define VCARD_NOSTARTADDRESS                                                   \
-    (__u32)0xE00A0023 // No startaddress defined in SBN (dll binary may be
-                      // corrupt)
+  (__u32)0xE00A0023 // No startaddress defined in SBN (dll binary may be
+                    // corrupt)
 #define VCARD_NOINTERRUPT (__u32)0xE00A0024 // Interrupt does not work
 
 //    Errors which can occur in the channel driver
 #define VCARD_DRIVERNOTPRESENT                                                 \
-    (__u32)0xE00A0025                        // Kernel mode driver is not loaded
+  (__u32)0xE00A0025                          // Kernel mode driver is not loaded
 #define VCARD_DEVICEISOPEN (__u32)0xE00A0026 // Device is already open
 #define VCARD_DEVICELOCKINGERROR (__u32)0xE00A0027 // Device can not be locked
 #define VCARD_OTHERFWISLOADED                                                  \
-    (__u32)0xE00A0028 // A other firmware is running on that device
-                      // (CANalyzer/CANopen/DeviceNet firmware)
+  (__u32)0xE00A0028 // A other firmware is running on that device
+                    // (CANalyzer/CANopen/DeviceNet firmware)
 #define VCARD_CHANNELNOTOPEN                                                   \
-    (__u32)0xE00A0029 // channel can not be accessed, because it is not open.
+  (__u32)0xE00A0029 // channel can not be accessed, because it is not open.
 
 //    Status codes for CANusb Device Driver canusbw.sys
 #define VCARD_PNPCALLERROR                                                     \
-    (__u32)0xE00A002A // lower driver call in PnP process fails
+  (__u32)0xE00A002A // lower driver call in PnP process fails
 #define VCARD_URBRETERROR (__u32)0xE00A002B // URB returns USBD_ERROR code
 #define VCARD_ERRORDEVICEDESC                                                  \
-    (__u32)0xE00A002C // faulty device desc or read failed
+  (__u32)0xE00A002C // faulty device desc or read failed
 #define VCARD_ERRORCONFIGDESC                                                  \
-    (__u32)0xE00A002D // faulty config desc or read failed
+  (__u32)0xE00A002D // faulty config desc or read failed
 #define VCARD_ERRORSELECTCONFIG                                                \
-    (__u32)0xE00A002E // unable to select configuration
+  (__u32)0xE00A002E // unable to select configuration
 #define VCARD_ERRORDECONFIG                                                    \
-    (__u32)0xE00A002F // unable to deconfigure the device
+  (__u32)0xE00A002F // unable to deconfigure the device
 #define VCARD_PIPEACCESSERROR (__u32)0xE00A0030 // unable to open usb pipe
 #define VCARD_COMMUNICATIONBROKEN                                              \
-    (__u32)0xE00A0031 // communication via usb pipe broken off
+  (__u32)0xE00A0031 // communication via usb pipe broken off
 
 //    Errors which can occur in the canchd.dll
 #define VCARD_FILENOTFOUND (__u32)0xE00A0032 // file not found
@@ -231,9 +235,9 @@ typedef struct {
 
 #define VCARD_OSERROR (__u32)0xE00A0034 // error in OS call
 #define VCARD_DEVICEIDMISMATCH                                                 \
-    (__u32)0xE00A0035 // wrong device id stored in registry
+  (__u32)0xE00A0035 // wrong device id stored in registry
 #define VCARD_MAXNUMOFCHANNELSOPEN                                             \
-    (__u32)0xE00A0036 // the maximum number of channels are open
+  (__u32)0xE00A0036 // the maximum number of channels are open
 #define VCARD_INVALIDHANDLE (__u32)0xE00A0037 // a invalid handle is specified
 
 #endif
@@ -245,10 +249,10 @@ typedef struct {
 #define CANL2_TOO_MANY_CHANNELS -1002      // no free channel available
 #define CANL2_VERSION_CONFLICT -1003       // wrong dll or driver version
 #define CANL2_FIRMWARE_DOWNLOAD                                                \
-    -1004 // error while loading the firmware may be a DPRAM access error
+  -1004 // error while loading the firmware may be a DPRAM access error
 
 #define CANL2_CAN_NOT_LOAD_CANUSBDLL                                           \
-    -1005 // the canusbm.dll can not be found/loaded
+  -1005 // the canusbm.dll can not be found/loaded
 
 #define INIL2_FW_FILE_NOT_FOUND -2000    // firmware file not found
 #define INIL2_ERROR_WHILE_FLASHING -2001 // flashing error
@@ -422,10 +426,9 @@ __s32 CANL2_enable_error_frame_detection(CAN_HANDLE Can);
 
 __s32 CANL2_get_device_id(CAN_HANDLE Can, __u32 *pulDeviceId);
 
-/* these functions are only available on the CAN-ACx-PCI. They are designed  */
-/* for use with the CAN-ACx-PCI and piggy-back boards. These functions are   */
-/* not in the standard users manual. For description read the piggy-back     */
-/* manuals                                                                   */
+// these functions are only available on the CAN-ACx-PCI. They are designed
+// for use with the CAN-ACx-PCI and piggy-back boards. These functions are
+// not in the standard users manual. For description read the piggy-back manuals
 __s32 CANL2_init_signals(CAN_HANDLE Can, __u32 ulChannelDirectionMask,
                          __u32 ulChannelOutputDefaults);
 
