@@ -72,7 +72,7 @@ static void interruption(CAN_HANDLE channel, backsense::RadarStateDB &stateDB,
         }
 
         DEBUG_INTERRUPTION("Read section");
-        // desciptor is ready to be read
+        // descriptor is ready to be read
         PARAM_STRUCT outParam;
         while ((ret = CANUtils::readBusEvent(channel, outParam))) {
             if (ret < 0 || shouldTerminate(futureSignal)) {
