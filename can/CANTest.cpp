@@ -33,7 +33,7 @@ static bool shouldTerminate(const std::future<void> &signal)
            std::future_status::ready;
 }
 
-static void printDetectionData(const DetectionData &state)
+static void printDetectionData(const can::backsense::DetectionData &state)
 {
     std::ostringstream ss;
     state.dump(ss);
@@ -86,7 +86,7 @@ static void interruption(CAN_HANDLE channel, backsense::RadarStateDB &stateDB,
             auto state = frameHandler.processRcvFrame(outParam);
             if (state) {
                 if (DEBUG_RECV_DATA) {
-                    printDetectionData(state);
+                    printDetectionData(*state);
                 }
                 stateDB.updateState(std::move(*state));
             }
