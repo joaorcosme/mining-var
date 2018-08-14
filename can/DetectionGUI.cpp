@@ -7,22 +7,32 @@
 
 using gui::DetectionGUI;
 
+static void adjustColumns(nana::listbox &lsbox)
+{
+    for (int i = 0; i < lsbox.column_size(); ++i) {
+        lsbox.column_at(i).text_align(::nana::align::center);
+        lsbox.column_at(i).fit_content();
+    }
+}
+
 DetectionGUI::DetectionGUI(const can::backsense::RadarStateDB &stateDB)
 {
     m_button.caption("Quit");
     m_button.events().click([this] { m_form.close(); });
 
     m_lsbox.append_header("Id");
-    m_lsbox.append_header("Radius");
-    m_lsbox.append_header("Angle");
-    m_lsbox.append_header("X Coord");
-    m_lsbox.append_header("Y Coord");
-    m_lsbox.append_header("Relative Speed");
-    m_lsbox.append_header("Signal Power");
+    m_lsbox.append_header("Radius (m)");
+    m_lsbox.append_header("Angle (deg)");
+    m_lsbox.append_header("X Coord (m)");
+    m_lsbox.append_header("Y Coord (m)");
+    m_lsbox.append_header("Relative Speed (km/h)");
+    m_lsbox.append_header("Signal Power (db)");
     m_lsbox.append_header("Object Id");
     m_lsbox.append_header("Appearance Status");
     m_lsbox.append_header("Trigger Event");
     m_lsbox.append_header("Detection Flag");
+
+    adjustColumns(m_lsbox);
 
     m_lsbox.at(0).shared_model<std::recursive_mutex>(stateDB.getSensorData(0),
                                                      cellTranslator);

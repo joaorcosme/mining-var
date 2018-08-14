@@ -102,7 +102,7 @@ class RelativeSpeed : public DetectionDataConverter<double>
   private:
     unsigned byteNumber() const override { return 4; }
     double resolution() const override { return 0.5; }
-    int offset() const override { return -128; }
+    int offset() const override { return -64; }
     __u8 minRawValue() const override { return 0x0; }
     __u8 maxRawValue() const override { return 0xFF; }
 };
