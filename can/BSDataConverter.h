@@ -17,155 +17,155 @@ namespace converter {
 
 template <typename PhyT> class DetectionDataConverter
 {
-public:
-  PhyT convert(const std::array<__u8, N_BYTES> &frame)
-  {
-    __u8 byte = frame[byteNumber()];
+  public:
+    PhyT convert(const std::array<__u8, N_BYTES> &frame)
+    {
+        __u8 byte = frame[byteNumber()];
 
-    // assert(byte >= minRawValue() && byte <= maxRawValue());
+        // assert(byte >= minRawValue() && byte <= maxRawValue());
 
-    if (dataLength() != N_BITS) {
-      byte >>= startBit();
-      byte <<= (N_BITS - dataLength());
-      byte >>= (N_BITS - dataLength());
+        if (dataLength() != N_BITS) {
+            byte >>= startBit();
+            byte <<= (N_BITS - dataLength());
+            byte >>= (N_BITS - dataLength());
+        }
+
+        PhyT value = byte * resolution() + offset();
     }
 
-    PhyT value = byte * resolution() + offset();
-  }
+  protected:
+    virtual unsigned byteNumber() const = 0;
+    virtual PhyT resolution() const = 0;
 
-protected:
-  virtual unsigned byteNumber() const = 0;
-  virtual PhyT resolution() const = 0;
-
-  virtual int offset() const { return 0; }
-  virtual unsigned dataLength() const { return N_BITS; }
-  virtual unsigned startBit() const { return 0; }
-  virtual __u8 minRawValue() const { return 0x0; }
-  virtual __u8 maxRawValue() const { return 0xFF; }
+    virtual int offset() const { return 0; }
+    virtual unsigned dataLength() const { return N_BITS; }
+    virtual unsigned startBit() const { return 0; }
+    virtual __u8 minRawValue() const { return 0x0; }
+    virtual __u8 maxRawValue() const { return 0xFF; }
 };
 
 class PolarRadius : public DetectionDataConverter<double>
 {
-public:
-  PolarRadius() = default;
+  public:
+    PolarRadius() = default;
 
-private:
-  unsigned byteNumber() const override { return 0; }
-  double resolution() const override { return 0.25; }
-  __u8 minRawValue() const override { return 0x0; }
-  __u8 maxRawValue() const override { return 0x79; }
+  private:
+    unsigned byteNumber() const override { return 0; }
+    double resolution() const override { return 0.25; }
+    __u8 minRawValue() const override { return 0x0; }
+    __u8 maxRawValue() const override { return 0x79; }
 };
 
 class PolarAngle : public DetectionDataConverter<int>
 {
-public:
-  PolarAngle() = default;
+  public:
+    PolarAngle() = default;
 
-private:
-  unsigned byteNumber() const override { return 1; }
-  int offset() const override { return -128; }
-  int resolution() const override { return 1; }
-  __u8 minRawValue() const override { return 0x44; }
-  __u8 maxRawValue() const override { return 0xBC; }
+  private:
+    unsigned byteNumber() const override { return 1; }
+    int offset() const override { return -128; }
+    int resolution() const override { return 1; }
+    __u8 minRawValue() const override { return 0x44; }
+    __u8 maxRawValue() const override { return 0xBC; }
 };
 
 class X : public DetectionDataConverter<double>
 {
-public:
-  X() = default;
+  public:
+    X() = default;
 
-private:
-  unsigned byteNumber() const override { return 2; }
-  double resolution() const override { return 0.25; }
-  __u8 minRawValue() const override { return 0x0; }
-  __u8 maxRawValue() const override { return 0x78; }
+  private:
+    unsigned byteNumber() const override { return 2; }
+    double resolution() const override { return 0.25; }
+    __u8 minRawValue() const override { return 0x0; }
+    __u8 maxRawValue() const override { return 0x78; }
 };
 
 class Y : public DetectionDataConverter<double>
 {
-public:
-  Y() = default;
+  public:
+    Y() = default;
 
-private:
-  unsigned byteNumber() const override { return 3; }
-  double resolution() const override { return 0.25; }
-  int offset() const override { return -32; }
-  __u8 minRawValue() const override { return 0x6C; }
-  __u8 maxRawValue() const override { return 0x94; }
+  private:
+    unsigned byteNumber() const override { return 3; }
+    double resolution() const override { return 0.25; }
+    int offset() const override { return -32; }
+    __u8 minRawValue() const override { return 0x6C; }
+    __u8 maxRawValue() const override { return 0x94; }
 };
 
 class RelativeSpeed : public DetectionDataConverter<double>
 {
-public:
-  RelativeSpeed() = default;
+  public:
+    RelativeSpeed() = default;
 
-private:
-  unsigned byteNumber() const override { return 4; }
-  double resolution() const override { return 0.5; }
-  int offset() const override { return -128; }
-  __u8 minRawValue() const override { return 0x0; }
-  __u8 maxRawValue() const override { return 0xFF; }
+  private:
+    unsigned byteNumber() const override { return 4; }
+    double resolution() const override { return 0.5; }
+    int offset() const override { return -128; }
+    __u8 minRawValue() const override { return 0x0; }
+    __u8 maxRawValue() const override { return 0xFF; }
 };
 
 class SignalPower : public DetectionDataConverter<int>
 {
-public:
-  SignalPower() = default;
+  public:
+    SignalPower() = default;
 
-private:
-  unsigned byteNumber() const override { return 5; }
-  int resolution() const override { return 1; }
-  __u8 minRawValue() const override { return 0x0; }
-  __u8 maxRawValue() const override { return 0x7F; }
+  private:
+    unsigned byteNumber() const override { return 5; }
+    int resolution() const override { return 1; }
+    __u8 minRawValue() const override { return 0x0; }
+    __u8 maxRawValue() const override { return 0x7F; }
 };
 
 class ObjectId : public DetectionDataConverter<int>
 {
-public:
-  ObjectId() = default;
+  public:
+    ObjectId() = default;
 
-private:
-  unsigned byteNumber() const override { return 6; }
-  unsigned startBit() const override { return 5; }
-  unsigned dataLength() const override { return 3; }
-  int resolution() const override { return 1; }
+  private:
+    unsigned byteNumber() const override { return 6; }
+    unsigned startBit() const override { return 5; }
+    unsigned dataLength() const override { return 3; }
+    int resolution() const override { return 1; }
 };
 
 class ObjectAppearanceStatus : public DetectionDataConverter<int>
 {
-public:
-  ObjectAppearanceStatus() = default;
+  public:
+    ObjectAppearanceStatus() = default;
 
-private:
-  unsigned byteNumber() const override { return 6; }
-  unsigned startBit() const override { return 4; }
-  unsigned dataLength() const override { return 1; }
-  int resolution() const override { return 1; }
+  private:
+    unsigned byteNumber() const override { return 6; }
+    unsigned startBit() const override { return 4; }
+    unsigned dataLength() const override { return 1; }
+    int resolution() const override { return 1; }
 };
 
 class TriggerEvent : public DetectionDataConverter<int>
 {
-public:
-  TriggerEvent() = default;
+  public:
+    TriggerEvent() = default;
 
-private:
-  unsigned byteNumber() const override { return 6; }
-  unsigned startBit() const override { return 1; }
-  unsigned dataLength() const override { return 2; }
-  int resolution() const override { return 1; }
+  private:
+    unsigned byteNumber() const override { return 6; }
+    unsigned startBit() const override { return 1; }
+    unsigned dataLength() const override { return 2; }
+    int resolution() const override { return 1; }
 };
 
 class DetectionFlag : public DetectionDataConverter<int>
 {
-public:
-  DetectionFlag() = default;
+  public:
+    DetectionFlag() = default;
 
-private:
-  unsigned byteNumber() const override { return 7; }
-  unsigned dataLength() const override { return 1; }
-  int resolution() const override { return 1; }
-  __u8 minRawValue() const override { return 0x0; }
-  __u8 maxRawValue() const override { return 0x1; }
+  private:
+    unsigned byteNumber() const override { return 7; }
+    unsigned dataLength() const override { return 1; }
+    int resolution() const override { return 1; }
+    __u8 minRawValue() const override { return 0x0; }
+    __u8 maxRawValue() const override { return 0x1; }
 };
 
 } // namespace converter
