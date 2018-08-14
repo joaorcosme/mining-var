@@ -133,7 +133,7 @@ void RadarStateDB::updateState(const DetectionData &&newState)
 }
 
 const std::vector<std::experimental::optional<DetectionData>> &
-RadarStateDB::getSensorData(unsigned sensorIdx)
+RadarStateDB::getSensorData(unsigned sensorIdx) const
 {
     assert(sensorIdx < m_db.size());
     return m_db[sensorIdx];

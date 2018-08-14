@@ -99,7 +99,7 @@ class RadarStateDB
 
     void updateState(const DetectionData &&newState);
 
-    const DetectionDataVec &getSensorData(unsigned sensorIdx);
+    const DetectionDataVec &getSensorData(unsigned sensorIdx) const;
 
   private:
     void autoClear();
