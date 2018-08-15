@@ -1,46 +1,42 @@
-GCC=g++-6
-CFLAGS=-g -Wall -std=c++17
-PRG=test
-OBJS=BSFrameHandler.o CANproChannel.o CANUtils.o CANTest.o DetectionGUI.o
-DEPS=-L/usr/local/lib \
-	 -lSoftingCan \
-	 -lnana \
-	 -lpthread \
-	 -lstdc++fs \
-	 -lX11 \
-	 -lrt \
-	 -lXft \
-	 -lpng \
-	 -lasound \
-	 -lfontconfig
+GCC = @g++-6
+CFLAGS = -c -g -Wpedantic -std=c++17
+PRG = can_test
 
-all: $(PRG) tags
+OBJS = BSFrameHandler.o CANproChannel.o \
+	   CANUtils.o CANTest.o DetectionGUI.o
+
+DEPS = -lpthread \
+	   -lSoftingCan \
+	   -lnana \
+	   -lstdc++fs \
+	   -lX11 \
+	   -lrt \
+	   -lXft \
+	   -lpng \
+	   -lasound \
+	   -lfontconfig
+
+all: tags $(PRG)
 
 $(PRG): $(OBJS)
-	$(GCC) -o $@ $^ $(CFLAGS) -I/usr/local/include $(DEPS)
+	@echo Linking...
+	$(GCC) $^ -o $@ $(DEPS)
+	@echo ----------------------
+	@echo Done!
 
-DetectionGUI.o : DetectionGUI.cpp
-	$(GCC) -c $^
-
-BSFrameHandler.o : BSFrameHandler.cpp
-	$(GCC) -c $^
-
-CANproChannel.o : CANproChannel.cpp
-	$(GCC) -c $^
-
-CANUtils.o : CANUtils.cpp
-	$(GCC) -c $^
-
-CANTest.o : CANTest.cpp
-	$(GCC) -c $^
+%.o : %.cpp
+	@echo Compiling $(^)...
+	$(GCC) $(CFLAGS) $^
 
 .PHONY: clean tags
 
 tags:
-	ctags -R --languages=c++
+	@echo Generating tags...
+	@ctags -R --languages=c++
 
 clean:
 	rm -f $(OBJS) $(PRG) *~
 
 format:
-	clang-format -style=file -i `find -name "*.h" -or -name "*.cpp"
+	clang-format -style=file -i \
+		`find -name "*.h" -or -name "*.cpp"
