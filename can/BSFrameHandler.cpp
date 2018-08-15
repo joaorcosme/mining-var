@@ -24,10 +24,6 @@
 #include <sstream>
 #include <utility>
 
-#define DEBUG_FRAME_HANDLER(MSG)                                                \
-    if (false)                                                                 \
-    std::cout << "#DEBUG: Frame Handler :::: " << MSG << std::endl
-
 // :::: class FrameHandler
 
 using can::backsense::DetectionData;
@@ -45,11 +41,6 @@ FrameHandler::processRcvFrame(const PARAM_STRUCT& frame)
 
     if (isDetectionObjectId(frame.Ident)) {
         optState = DetectionData(frame.RCV_data, frame.Ident);
-
-        if (optState && optState->getDetectionFlag()) {
-            DEBUG_FRAME_HANDLER("No object detection.");
-            optState = nullopt;
-        }
     }
     return optState;
 }
