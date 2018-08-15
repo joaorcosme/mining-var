@@ -1,17 +1,21 @@
 GCC = @g++-6
-CFLAGS = -g -Wpedantic -std=c++17
+CFLAGS = -c -g -Wpedantic -std=c++17
 PRG = aaaar
+
+OBJS = main.o
 
 OPENCV = `pkg-config opencv --cflags --libs`
 DEPS = -lpthread $(OPENCV)
 
-$(PRG): main.cpp
-	$(GCC) $(CFLAGS) -o $@ $^ $(DEPS)
+$(PRG): $(OBJS)
+	@echo Linking...
+	$(GCC) $^ -o $@ $(DEPS)
 
-.PHONY: clean tags
+%.o : %.cpp
+	@echo Compiling $(^)...
+	$(GCC) $(CFLAGS) $^
+
+.PHONY: clean
 
 clean:
-	rm -f $(PRG).o $(PRG) *~
-
-format:
-	clang-format -style=file -i	`find -name "*.h" -or -name "*.cpp"`
+	rm -f $(OBJS) $(PRG) *~

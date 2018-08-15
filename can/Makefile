@@ -16,26 +16,17 @@ DEPS = -lpthread \
 	   -lasound \
 	   -lfontconfig
 
-all: tags $(PRG)
+all: $(PRG)
 
 $(PRG): $(OBJS)
 	@echo Linking...
 	$(GCC) $^ -o $@ $(DEPS)
-	@echo ----------------------
-	@echo Done!
 
 %.o : %.cpp
 	@echo Compiling $(^)...
 	$(GCC) $(CFLAGS) $^
 
-.PHONY: clean tags
-
-tags:
-	@echo Generating tags...
-	@ctags -R --languages=c++
+.PHONY: clean
 
 clean:
 	rm -f $(OBJS) $(PRG) *~
-
-format:
-	clang-format -style=file -i	`find -name "*.h" -or -name "*.cpp"`
