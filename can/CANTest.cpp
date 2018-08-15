@@ -1,6 +1,6 @@
 /*
  *   Displays the data transmitted by the BS-9000 sensor in the CAN bus
- *   for testing purposes.
+ *   (for testing purposes).
  *
  *   Copyright (C) 2018  Joao Cosme <joaorcosme@gmail.com>
  *
@@ -20,7 +20,6 @@
  */
 
 #include "BSFrameHandler.h"
-#include "CANL2.h"
 #include "CANUtils.h"
 #include "CANproChannel.h"
 #include "DetectionGUI.h"
@@ -31,11 +30,14 @@
 #include <thread>
 #include <utility> // std::move
 
+
 int main(int argc, char** argv)
 {
+    static constexpr unsigned N_SENSORS = 1;
+
     try {
         can::CANproChannel channel;
-        can::backsense::RadarStateDB stateDB(1);
+        can::backsense::RadarStateDB stateDB(N_SENSORS);
 
         std::promise<void> exitSignal;
         std::future<void> futureSignal = exitSignal.get_future();
@@ -44,7 +46,6 @@ int main(int argc, char** argv)
                                         std::move(futureSignal));
 
         gui::DetectionGUI interface(stateDB);
-
         // blocking call
         interface.launchGUI();
 
