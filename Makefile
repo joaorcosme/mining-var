@@ -5,7 +5,7 @@ all: tags comp
 comp:
 	$(MAKE) -C can
 	@echo --------------------------------
-	$(MAKE) -C augmented_reality
+	$(MAKE) -C augreality
 	@echo --------------------------------
 	@echo Done!
 
@@ -24,4 +24,4 @@ clean:
 	@echo --------------------------------
 	$(MAKE) clean -C can
 	@echo --------------------------------
-	$(MAKE) clean -C augmented_reality
+	$(MAKE) clean -C augreality
