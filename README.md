@@ -8,11 +8,11 @@ This repository contains an Augmented Reality application to aid mining vehicle 
 
 This project depends on:
 
-- [Nana 1.6.1] (http://nanapro.org/en-us/)
+- [Nana 1.6.1](http://nanapro.org/en-us/)
 
-- [OpenCV 2.4] (https://opencv.org/)
+- [OpenCV 2.4](https://opencv.org/)
 
-- [Driver and CAN Layer 2 API for the Softing CANpro USB interface] (https://industrial.softing.com/en/products/interface-cards-gateways/usb-interface-cards/can/can-single-channel-usb-interface-card.html)
+- [Driver and CAN Layer 2 API for the Softing CANpro USB interface](https://industrial.softing.com/en/products/interface-cards-gateways/usb-interface-cards/can/can-single-channel-usb-interface-card.html)
 
 If these libraries are correctly installed, you just need to run `make` on the root directory to compile the application.
 
