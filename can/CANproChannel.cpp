@@ -79,16 +79,16 @@ void CANproChannel::queryChannel()
 
 void CANproChannel::initializeChannel()
 {
-    std::string name((char *)m_pChannel->ChannelName);
+    std::string name((char*)m_pChannel->ChannelName);
     std::cout << "#INFO: Initializing channel \"" << name << "\"." << std::endl;
 
     CANL2_CH_STRUCT channel;
-    name.copy((char *)channel.sChannelName, name.length());
+    name.copy((char*)channel.sChannelName, name.length());
 
     // we might as well use a custom channel name here...
 
     int retCode = INIL2_initialize_channel(&channel.ulChannelHandle,
-                                           (char *)channel.sChannelName);
+                                           (char*)channel.sChannelName);
 
     if (retCode) {
         throw std::runtime_error("#ERROR " + std::to_string(retCode) +

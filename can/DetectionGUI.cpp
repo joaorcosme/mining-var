@@ -7,7 +7,7 @@
 
 using gui::DetectionGUI;
 
-static void adjustColumns(nana::listbox &lsbox)
+static void adjustColumns(nana::listbox& lsbox)
 {
     for (int i = 0; i < lsbox.column_size(); ++i) {
         lsbox.column_at(i).text_align(::nana::align::center);
@@ -15,7 +15,7 @@ static void adjustColumns(nana::listbox &lsbox)
     }
 }
 
-DetectionGUI::DetectionGUI(const can::backsense::RadarStateDB &stateDB)
+DetectionGUI::DetectionGUI(const can::backsense::RadarStateDB& stateDB)
 {
     m_button.caption("Quit");
     m_button.events().click([this] { m_form.close(); });
@@ -57,7 +57,7 @@ void DetectionGUI::launchGUI()
 }
 
 std::vector<nana::listbox::cell> DetectionGUI::cellTranslator(
-    const std::experimental::optional<can::backsense::DetectionData> &data)
+    const std::experimental::optional<can::backsense::DetectionData>& data)
 {
     constexpr unsigned numParams = 11;
     std::vector<nana::listbox::cell> cells;

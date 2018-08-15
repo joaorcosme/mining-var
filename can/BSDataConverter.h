@@ -18,7 +18,7 @@ namespace converter {
 template <typename PhyT> class DetectionDataConverter
 {
   public:
-    PhyT convert(const std::array<__u8, N_BYTES> &frame)
+    PhyT convert(const std::array<__u8, N_BYTES>& frame)
     {
         __u8 byte = frame[byteNumber()];
 

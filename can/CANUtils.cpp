@@ -8,13 +8,13 @@ using can::CANUtils;
 
 constexpr std::array<char, 16> CANUtils::m_hexMap;
 
-int CANUtils::readBusEvent(CAN_HANDLE can, PARAM_STRUCT &retParam)
+int CANUtils::readBusEvent(CAN_HANDLE can, PARAM_STRUCT& retParam)
 {
     retParam.DataLength = 3;
     return CANL2_read_ac(can, &retParam);
 }
 
-std::string CANUtils::formatHexStr(const __u8 *data, const __s32 len)
+std::string CANUtils::formatHexStr(const __u8* data, const __s32 len)
 {
     // input: an array of bytes, like: |100|045|099|000|253|022|009|150|
     // each byte is a __u8 type, which corresponds to a char
@@ -35,7 +35,7 @@ std::string CANUtils::formatHexStr(const __u8 *data, const __s32 len)
     return hexData;
 }
 
-void CANUtils::printReceivedData(int frc, const PARAM_STRUCT &param)
+void CANUtils::printReceivedData(int frc, const PARAM_STRUCT& param)
 {
     // for now, we are only interested in this type of frame
     if (frc == CANL2_RA_DATAFRAME) {

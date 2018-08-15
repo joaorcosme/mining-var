@@ -12,7 +12,7 @@ std::unordered_map<__u32, std::pair<unsigned, unsigned>>
     FrameHandler::s_detectionIdsToIndexes;
 
 std::experimental::optional<DetectionData>
-FrameHandler::processRcvFrame(const PARAM_STRUCT &frame)
+FrameHandler::processRcvFrame(const PARAM_STRUCT& frame)
 {
     assert(frame.DataLength == N_BYTES);
 
@@ -101,7 +101,7 @@ int DetectionData::getDetectionFlag() const
     return converter::DetectionFlag().convert(m_frame);
 }
 
-void DetectionData::dump(std::ostream &out) const
+void DetectionData::dump(std::ostream& out) const
 {
     auto objid = getObjectId();
     auto appea = getObjectAppearanceStatus();
@@ -123,7 +123,7 @@ void DetectionData::dump(std::ostream &out) const
 
 using can::backsense::RadarStateDB;
 
-void RadarStateDB::updateState(const DetectionData &&newState)
+void RadarStateDB::updateState(const DetectionData&& newState)
 {
     autoClear();
 
@@ -132,7 +132,7 @@ void RadarStateDB::updateState(const DetectionData &&newState)
     m_db[idxPair.first][idxPair.second] = OptDetectionData(newState);
 }
 
-const std::vector<std::experimental::optional<DetectionData>> &
+const std::vector<std::experimental::optional<DetectionData>>&
 RadarStateDB::getSensorData(unsigned sensorIdx) const
 {
     assert(sensorIdx < m_db.size());

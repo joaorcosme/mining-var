@@ -23,13 +23,13 @@
 
 #define DEBUG_RECV_DATA false
 
-static bool shouldTerminate(const std::future<void> &signal)
+static bool shouldTerminate(const std::future<void>& signal)
 {
     return signal.wait_for(std::chrono::system_clock::duration::zero()) ==
            std::future_status::ready;
 }
 
-static void printDetectionData(const can::backsense::DetectionData &state)
+static void printDetectionData(const can::backsense::DetectionData& state)
 {
     std::ostringstream ss;
     state.dump(ss);
@@ -38,7 +38,7 @@ static void printDetectionData(const can::backsense::DetectionData &state)
 
 namespace can {
 
-static void interruption(CAN_HANDLE channel, backsense::RadarStateDB &stateDB,
+static void interruption(CAN_HANDLE channel, backsense::RadarStateDB& stateDB,
                          std::future<void> futureSignal)
 {
     DEBUG_INTERRUPTION("Thread start");
@@ -101,7 +101,7 @@ endthread:
 
 } // namespace can
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
 
     try {
@@ -121,7 +121,7 @@ int main(int argc, char **argv)
         can::CANUtils::resetChip(channel.getHandle());
         interruptionHandler.join();
 
-    } catch (std::runtime_error &ex) {
+    } catch (std::runtime_error& ex) {
         std::cerr << "#ERROR: " << ex.what() << std::endl;
     }
 

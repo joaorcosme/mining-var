@@ -20,17 +20,17 @@ namespace gui {
 class DetectionGUI
 {
   public:
-    DetectionGUI(const DetectionGUI &other) = delete;
-    DetectionGUI &operator=(const DetectionGUI &) = delete;
+    DetectionGUI(const DetectionGUI& other) = delete;
+    DetectionGUI& operator=(const DetectionGUI&) = delete;
 
-    DetectionGUI(const can::backsense::RadarStateDB &stateDB);
+    DetectionGUI(const can::backsense::RadarStateDB& stateDB);
     void launchGUI();
 
   private:
     // translate data from our DB into text that can be
     // displayed in the "listbox" cells
     static std::vector<nana::listbox::cell> cellTranslator(
-        const std::experimental::optional<can::backsense::DetectionData> &data);
+        const std::experimental::optional<can::backsense::DetectionData>& data);
 
   private:
     // TODO: there are probably better ways to define the

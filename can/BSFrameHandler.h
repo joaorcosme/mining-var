@@ -26,8 +26,8 @@ class FrameHandler;
 class DetectionData
 {
   public:
-    DetectionData(const DetectionData &other) = default;
-    DetectionData &operator=(const DetectionData &) = default;
+    DetectionData(const DetectionData& other) = default;
+    DetectionData& operator=(const DetectionData&) = default;
 
     __u32 getId() const { return m_detectionId; }
     std::string getStrHexId() const;
@@ -43,10 +43,10 @@ class DetectionData
     int getTriggerEvent() const;
     int getDetectionFlag() const;
 
-    void dump(std::ostream &out) const;
+    void dump(std::ostream& out) const;
 
   private:
-    explicit DetectionData(const __u8 *data, const __u32 detectionId)
+    explicit DetectionData(const __u8* data, const __u32 detectionId)
         : m_detectionId(detectionId)
     {
         std::copy(data, data + N_BYTES, m_frame.begin());
@@ -65,12 +65,12 @@ using OptDetectionData = std::experimental::optional<DetectionData>;
 class FrameHandler
 {
   public:
-    FrameHandler(const FrameHandler &) = delete;
-    FrameHandler &operator=(const FrameHandler &) = delete;
+    FrameHandler(const FrameHandler&) = delete;
+    FrameHandler& operator=(const FrameHandler&) = delete;
 
     FrameHandler() { initializeDetectionIds(); }
 
-    OptDetectionData processRcvFrame(const PARAM_STRUCT &frame);
+    OptDetectionData processRcvFrame(const PARAM_STRUCT& frame);
 
     static std::pair<unsigned, unsigned> getIndexPairFromId(const __u32 id);
 
@@ -97,9 +97,9 @@ class RadarStateDB
         m_db.assign(nSensors, DetectionDataVec(MAX_N_OBJS, nullopt));
     }
 
-    void updateState(const DetectionData &&newState);
+    void updateState(const DetectionData&& newState);
 
-    const DetectionDataVec &getSensorData(unsigned sensorIdx) const;
+    const DetectionDataVec& getSensorData(unsigned sensorIdx) const;
 
   private:
     void autoClear();

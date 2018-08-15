@@ -8,8 +8,8 @@ namespace can {
 class CANproChannel
 {
   public:
-    CANproChannel &operator=(const CANproChannel) = delete;
-    CANproChannel(const CANproChannel &) = delete;
+    CANproChannel& operator=(const CANproChannel) = delete;
+    CANproChannel(const CANproChannel&) = delete;
 
     CANproChannel();
     ~CANproChannel();
@@ -26,7 +26,7 @@ class CANproChannel
   private:
     CAN_HANDLE m_handle;
     L2CONFIG m_l2Config;
-    CHDSNAPSHOT *m_pChannel{new CHDSNAPSHOT};
+    CHDSNAPSHOT* m_pChannel{new CHDSNAPSHOT};
 };
 
 } // namespace can

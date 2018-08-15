@@ -282,8 +282,8 @@ typedef struct
 // later versions of this API (see sample program can_tst)
 #define CANL2_handle_to_descriptor(handle) handle
 
-__s32 INIL2_initialize_channel(CAN_HANDLE *pu32ChannelHandle,
-                               char *pChannelName);
+__s32 INIL2_initialize_channel(CAN_HANDLE* pu32ChannelHandle,
+                               char* pChannelName);
 
 __s32 CANL2_reset_board(CAN_HANDLE Can);
 
@@ -306,7 +306,7 @@ __s32 CANL2_initialize_interface(
     __s32 TransmitAckEnableAll, __s32 TransmitAckFifoEnable,
     __s32 TransmitRmtFifoEnable);
 
-__s32 CANL2_define_object(CAN_HANDLE Can, __u32 Handle, __s32 *ObjectNumber,
+__s32 CANL2_define_object(CAN_HANDLE Can, __u32 Handle, __s32* ObjectNumber,
                           __s32 Type, __s32 ReceiveIntEnable,
                           __s32 AutoRemoteEnable, __s32 TransmitAckEnable);
 
@@ -325,20 +325,20 @@ __s32 CANL2_enable_dyn_obj_buf(CAN_HANDLE Can);
 
 __s32 CANL2_enable_fifo_transmit_ack(CAN_HANDLE Can);
 
-__s32 CANL2_initialize_fifo_mode(CAN_HANDLE Can, L2CONFIG *pUserCfg);
+__s32 CANL2_initialize_fifo_mode(CAN_HANDLE Can, L2CONFIG* pUserCfg);
 
 __s32 CANL2_get_all_CAN_channels(__u32 u32ProvidedBufferSize,
-                                 OUT __u32 *pu32NeededBufferSize,
-                                 OUT __u32 *pu32NumOfChannels,
+                                 OUT __u32* pu32NeededBufferSize,
+                                 OUT __u32* pu32NumOfChannels,
                                  OUT PCHDSNAPSHOT pBuffer);
 
 // the parameter hw_version is not used with the CAN-AC2
-__s32 CANL2_get_version(CAN_HANDLE Can, __s32 *sw_version, __s32 *fw_version,
-                        __s32 *hw_version, __s32 *license,
-                        __s32 *can_chip_type);
+__s32 CANL2_get_version(CAN_HANDLE Can, __s32* sw_version, __s32* fw_version,
+                        __s32* hw_version, __s32* license,
+                        __s32* can_chip_type);
 
 // this function has no effect on the CAN-AC2
-__s32 CANL2_get_serial_number(CAN_HANDLE Can, __u32 *ser_number);
+__s32 CANL2_get_serial_number(CAN_HANDLE Can, __u32* ser_number);
 
 // -- CANusb return values
 #define FRW_IOE_ERR_NOTENOUGHMEMORY -612 // not enough memory
@@ -350,21 +350,21 @@ __s32 CANL2_send_remote_object(CAN_HANDLE Can, __s32 ObjectNumber,
                                __s32 DataLength);
 
 __s32 CANL2_supply_object_data(CAN_HANDLE Can, __s32 ObjectNumber,
-                               __s32 DataLength, __u8 *pData);
+                               __s32 DataLength, __u8* pData);
 
 __s32 CANL2_supply_rcv_object_data(CAN_HANDLE Can, __s32 ObjectNumber,
-                                   __s32 DataLength, __u8 *pData);
+                                   __s32 DataLength, __u8* pData);
 
 __s32 CANL2_send_object(CAN_HANDLE Can, __s32 ObjectNumber, __s32 DataLength);
 
 __s32 CANL2_write_object(CAN_HANDLE Can, __s32 ObjectNumber, __s32 DataLength,
-                         __u8 *pData);
+                         __u8* pData);
 
-__s32 CANL2_read_rcv_data(CAN_HANDLE Can, __s32 ObjectNumber, __u8 *pRCV_Data,
-                          __u32 *Time);
+__s32 CANL2_read_rcv_data(CAN_HANDLE Can, __s32 ObjectNumber, __u8* pRCV_Data,
+                          __u32* Time);
 
 __s32 CANL2_read_xmt_data(CAN_HANDLE Can, __s32 ObjectNumber,
-                          __s32 *pDataLength, __u8 *pXMT_Data);
+                          __s32* pDataLength, __u8* pXMT_Data);
 
 // +--- CANL2_read_ac                ---------------------------------------*/
 #define CANL2_RA_NO_DATA 0             // no new data received
@@ -387,20 +387,20 @@ __s32 CANL2_read_xmt_data(CAN_HANDLE Can, __s32 ObjectNumber,
 #define CANL2_RA_ERRORFRAME 15         // error frame detected
                                        //   (only CANcard)
 
-__s32 CANL2_read_ac(CAN_HANDLE Can, PARAM_STRUCT *param);
+__s32 CANL2_read_ac(CAN_HANDLE Can, PARAM_STRUCT* param);
 
 __s32 CANL2_send_data(CAN_HANDLE Can, __u32 Ident, __s32 Xtd, __s32 DataLength,
-                      __u8 *pData);
+                      __u8* pData);
 
 __s32 CANL2_send_remote(CAN_HANDLE Can, __u32 Ident, __s32 Xtd,
                         __s32 DataLength);
 
 // these functions have no effect on the CANcard
-__s32 CANL2_get_trigger(CAN_HANDLE Can, __s32 *level);
+__s32 CANL2_get_trigger(CAN_HANDLE Can, __s32* level);
 
 __s32 CANL2_reinitialize(CAN_HANDLE Can);
 
-__s32 CANL2_get_time(CAN_HANDLE Can, __u32 *time);
+__s32 CANL2_get_time(CAN_HANDLE Can, __u32* time);
 
 #define CANL2_GBS_ERROR_ACTIVE 0  // error active
 #define CANL2_GBS_ERROR_PASSIVE 1 // error passive
@@ -424,7 +424,7 @@ __s32 INIL2_close_channel(CAN_HANDLE Can);
 // this function has no effect on the CAN-AC2
 __s32 CANL2_enable_error_frame_detection(CAN_HANDLE Can);
 
-__s32 CANL2_get_device_id(CAN_HANDLE Can, __u32 *pulDeviceId);
+__s32 CANL2_get_device_id(CAN_HANDLE Can, __u32* pulDeviceId);
 
 // these functions are only available on the CAN-ACx-PCI. They are designed
 // for use with the CAN-ACx-PCI and piggy-back boards. These functions are
@@ -432,7 +432,7 @@ __s32 CANL2_get_device_id(CAN_HANDLE Can, __u32 *pulDeviceId);
 __s32 CANL2_init_signals(CAN_HANDLE Can, __u32 ulChannelDirectionMask,
                          __u32 ulChannelOutputDefaults);
 
-__s32 CANL2_read_signals(CAN_HANDLE Can, __u32 *pulChannelRead);
+__s32 CANL2_read_signals(CAN_HANDLE Can, __u32* pulChannelRead);
 
 __s32 CANL2_write_signals(CAN_HANDLE Can, __u32 pulChannelWrite,
                           __u32 ulCareMask);
