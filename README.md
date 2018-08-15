@@ -4,7 +4,8 @@
 
 This repository contains an Augmented Reality application to aid mining vehicle operators.
 
-Author: João Cosme <joaorcosme@gmail.com>
+Author: João Cosme (joaorcosme@gmail.com)
+
 On Bitbucket: https://bitbucket.org/joaorcosme/pfc/
 
 #### Installation
