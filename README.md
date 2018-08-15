@@ -1,8 +1,11 @@
-![truck]("https://bitbucket.org/joaorcosme/pfc/raw/226c2432749f71b29c81a8b9107d468659ba82ff/etc/truck.png")
+![truck](https://bitbucket.org/joaorcosme/pfc/raw/bda0d4c984e351e6121811aea09a06206f71a724/etc/truck.png)
 
 ### An Augmented Reality Application
 
 This repository contains an Augmented Reality application to aid mining vehicle operators.
+
+Author: João Cosme <joaorcosme@gmail.com>
+On Bitbucket: https://bitbucket.org/joaorcosme/pfc/
 
 #### Installation
 
@@ -16,4 +19,6 @@ This project depends on:
 
 If these libraries are correctly installed, you just need to run `make` on the root directory to compile the application.
 
-#### Additional Information
+#### License
+
+The GNU General Public License v3.0
