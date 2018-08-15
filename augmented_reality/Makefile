@@ -2,7 +2,7 @@ GCC = @g++-6
 CFLAGS = -c -g -Wpedantic -std=c++17
 PRG = aaaar
 
-OBJS = main.o
+OBJS = MainAR.o
 
 OPENCV = `pkg-config opencv --cflags --libs`
 DEPS = -lpthread $(OPENCV)

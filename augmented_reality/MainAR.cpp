@@ -1,16 +1,11 @@
-#include <iostream>
-
-#include "opencv2/core.hpp"
-#include "opencv2/highgui.hpp"
-#include "opencv2/videoio.hpp"
-
+#include <opencv2/core.hpp>
+#include <opencv2/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/videoio.hpp>
 
-#include <atomic>
 #include <chrono>
 #include <random>
 #include <string>
-#include <thread>
 #include <utility>
 #include <vector>
 
@@ -75,53 +70,6 @@ void BarGraph::drawPercentageTxt(cv::Mat& frame, const double fraction)
     cv::putText(frame, txt, m_txtOrg, m_fontFace, 1, cv::Scalar(0, 0, 255), 2);
 }
 
-class SimulatedSensor
-{
-  public:
-    SimulatedSensor() = delete;
-    SimulatedSensor(int interval = 1000)
-        : m_thread(&SimulatedSensor::updateFraction, this)
-        , m_msInterval(interval)
-    {
-        m_fraction.store(0.0);
-    }
-
-    ~SimulatedSensor()
-    {
-        m_leaving = true;
-        m_thread.join();
-    }
-
-    double getFraction() { return m_fraction.load(); }
-
-  private:
-    void updateFraction()
-    {
-        using namespace std;
-        while (!m_leaving) {
-            this_thread::sleep_for(chrono::milliseconds(m_msInterval));
-            m_fraction.store(generateRandom(0.0, 1.0));
-        }
-    }
-
-    static double generateRandom(double min, double max)
-    {
-        std::random_device rdev;
-        std::mt19937 rgen(rdev());
-        std::uniform_real_distribution<> iDist(min, max);
-        return iDist(rgen);
-    }
-
-  private:
-    std::thread m_thread;
-    std::atomic<double> m_fraction;
-    const int m_msInterval;
-    bool m_leaving{false};
-};
-
-/**
- * --------------- main ----------------
- */
 int main(int argc, char** argv)
 {
     cv::Mat frame;
@@ -130,13 +78,14 @@ int main(int argc, char** argv)
     // access built-in camera at index 0
     assert(cap.open(0));
 
-    BarGraph bGraph1(cv::Point(50, 50), 80 /* width */, 300 /* height */);
-    BarGraph bGraph2(cv::Point(200, 50), 80 /* width */, 300 /* height */);
-    BarGraph bGraph3(cv::Point(350, 50), 80 /* width */, 300 /* height */);
+    BarGraph bGraph1(cv::Point(50, 50), 80, 300);
+    BarGraph bGraph2(cv::Point(200, 50), 80, 300);
+    BarGraph bGraph3(cv::Point(350, 50), 80, 300);
 
-    SimulatedSensor sensor1(1500 /* interval in ms */);
-    SimulatedSensor sensor2(1500 /* interval in ms */);
-    SimulatedSensor sensor3(1500 /* interval in ms */);
+    using namespace std::chrono_literals;
+    SensorSimulator sensor1(1500ms);
+    SensorSimulator sensor2(1500ms);
+    SensorSimulator sensor3(1500ms);
 
     while (true) {
         cap >> frame;
