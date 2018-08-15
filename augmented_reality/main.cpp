@@ -147,8 +147,9 @@ int main(int argc, char** argv)
         bGraph3.draw(frame, sensor3.getFraction());
 
         cv::imshow("Live", frame);
-        if (cv::waitKey(5) >= 0)
+        if (cv::waitKey(5) >= 0) {
             break;
+        }
     }
 
     return 0;
