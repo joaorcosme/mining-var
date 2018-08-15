@@ -18,12 +18,26 @@
  *
  */
 
-#include "CANproChannel.h"
 #include "CANUtils.h"
+#include "BSFrameHandler.h"
+#include "CANproChannel.h"
 
 #include <cassert>
+#include <cerrno>
+#include <cstring>
+#include <sys/poll.h>
+
+#include <chrono>
+#include <experimental/optional>
 #include <iomanip>
 #include <iostream>
+#include <sstream>
+
+#define DEBUG_INTERRUPTION(MSG)                                                \
+    if (false)                                                                 \
+    std::cout << "#DEBUG: Interruption Thread :::: " << MSG << std::endl
+
+#define DEBUG_RECV_DATA false
 
 using can::CANUtils;
 
@@ -69,4 +83,79 @@ void CANUtils::printReceivedData(int frc, const PARAM_STRUCT& param)
     } else {
         assert(false);
     }
+}
+
+static bool shouldTerminate(const std::future<void>& signal)
+{
+    return signal.wait_for(std::chrono::system_clock::duration::zero()) ==
+           std::future_status::ready;
+}
+
+static void printDetectionData(const can::backsense::DetectionData& state)
+{
+    std::ostringstream ss;
+    state.dump(ss);
+    std::cout << ss.str();
+}
+
+static void CANUtils::interruption(CAN_HANDLE channel,
+                                   backsense::RadarStateDB& stateDB,
+                                   std::future<void> futureSignal)
+{
+    DEBUG_INTERRUPTION("Thread start");
+
+    struct pollfd can_poll;
+
+    backsense::FrameHandler frameHandler;
+
+    while (!shouldTerminate(futureSignal)) {
+
+        can_poll.fd = CANL2_handle_to_descriptor(channel);
+        can_poll.events = POLLIN | POLLHUP;
+
+        int ret = 0;
+
+        DEBUG_INTERRUPTION("Poll section");
+        // wait for event on file descriptor
+        while (ret <= 0) {
+            ret = poll(&can_poll, 1 /*nfds*/, -1 /*timeout*/);
+
+            if (can_poll.revents & POLLHUP) {
+                goto endthread;
+            }
+            if ((ret == -1) && (errno != EINTR)) {
+                std::cerr << "#Error: poll() [" << std::strerror(errno) << "]";
+            }
+        }
+
+        DEBUG_INTERRUPTION("Read section");
+        // descriptor is ready to be read
+        PARAM_STRUCT outParam;
+        while ((ret = CANUtils::readBusEvent(channel, outParam))) {
+            if (ret < 0 || shouldTerminate(futureSignal)) {
+                goto endthread;
+            }
+
+            if (DEBUG_RECV_DATA) {
+                CANUtils::printReceivedData(ret, outParam);
+            }
+
+            auto state = frameHandler.processRcvFrame(outParam);
+            if (state) {
+                if (DEBUG_RECV_DATA) {
+                    printDetectionData(*state);
+                }
+
+                // This is probably the most important step in this loop:
+                // we've read the raw data from the CAN bus, converted into
+                // a DetectionData object, and now we are able to update the DB,
+                // overwriting the state for the corresponding object id.
+                stateDB.updateState(std::move(*state));
+            }
+        }
+    }
+
+endthread:
+    DEBUG_INTERRUPTION("Thread end");
+    return;
 }

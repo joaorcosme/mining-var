@@ -25,9 +25,16 @@
 #include "CANproChannel.h"
 
 #include <array>
+#include <future>
 #include <string>
 
 namespace can {
+
+namespace backsense {
+
+class RadarStateDB;
+
+} // namespace backsense
 
 class CANUtils
 {
@@ -40,6 +47,9 @@ class CANUtils
     static int readBusEvent(CAN_HANDLE can, PARAM_STRUCT& retParam);
     static void resetChip(CAN_HANDLE can) { CANL2_reset_chip(can); }
     static void printReceivedData(int frc, const PARAM_STRUCT& param);
+    static void interruption(CAN_HANDLE channel,
+                             backsense::RadarStateDB& stateDB,
+                             std::future<void> futureSignal);
 
   private:
     static std::string formatHexStr(const __u8* data, const __s32 len);

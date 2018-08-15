@@ -148,9 +148,13 @@ void RadarStateDB::updateState(const DetectionData&& newState)
 {
     autoClear();
 
-    auto id = newState.getId();
-    auto idxPair = FrameHandler::getIndexPairFromId(id);
-    m_db[idxPair.first][idxPair.second] = OptDetectionData(newState);
+    if (!newState.getDetectionFlag()) {
+        auto id = newState.getId();
+        auto idxPair = FrameHandler::getIndexPairFromId(id);
+        m_db[idxPair.first][idxPair.second] = OptDetectionData(newState);
+    } else {
+        // no object detection
+    }
 }
 
 const std::vector<std::experimental::optional<DetectionData>>&
