@@ -98,7 +98,7 @@ static void printDetectionData(const can::backsense::DetectionData& state)
     std::cout << ss.str();
 }
 
-static void CANUtils::interruption(CAN_HANDLE channel,
+void CANUtils::interruption(CAN_HANDLE channel,
                                    backsense::RadarStateDB& stateDB,
                                    std::future<void> futureSignal)
 {
