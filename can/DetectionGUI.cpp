@@ -1,19 +1,38 @@
+/*
+ *   A graphical interface to display physical data from the BS-9000 sensor.
+ *
+ *   Copyright (C) 2018  Joao Cosme <joaorcosme@gmail.com>
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License, or
+ *   (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ *
+ *   You should have received a copy of the GNU General Public License
+ *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
 #include "DetectionGUI.h"
 #include "BSFrameHandler.h"
 
 #include <chrono>
 #include <thread>
-#include <vector>
-
-using gui::DetectionGUI;
 
 static void adjustColumns(nana::listbox& lsbox)
 {
-    for (int i = 0; i < lsbox.column_size(); ++i) {
+    for (unsigned i = 0; i < lsbox.column_size(); ++i) {
         lsbox.column_at(i).text_align(::nana::align::center);
         lsbox.column_at(i).fit_content();
     }
 }
+
+using gui::DetectionGUI;
 
 DetectionGUI::DetectionGUI(const can::backsense::RadarStateDB& stateDB)
 {
@@ -47,7 +66,7 @@ void DetectionGUI::launchGUI()
     std::thread updater([this]() {
         using namespace std::chrono_literals;
         while (true) {
-            std::this_thread::sleep_for(1s);
+            std::this_thread::sleep_for(250ms);
             nana::API::refresh_window(m_lsbox);
         }
     });
@@ -59,7 +78,7 @@ void DetectionGUI::launchGUI()
 std::vector<nana::listbox::cell> DetectionGUI::cellTranslator(
     const std::experimental::optional<can::backsense::DetectionData>& data)
 {
-    constexpr unsigned numParams = 11;
+    static constexpr unsigned numParams = 11;
     std::vector<nana::listbox::cell> cells;
 
     if (data) {

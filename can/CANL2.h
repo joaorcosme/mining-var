@@ -1,4 +1,22 @@
-// Based on the CANL2 interface provided by Softing
+/*
+ *   CAN Layer 2 API. Credits: Softing AG.
+ *
+ *   Copyright (C) 2018  Joao Cosme <joaorcosme@gmail.com>
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License, or
+ *   (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ *
+ *   You should have received a copy of the GNU General Public License
+ *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
 
 #ifndef _CANL2_H_
 #define _CANL2_H_
@@ -131,117 +149,6 @@ typedef struct
 #define ERROR_BASE (0xE0000000)
 #endif
 
-#define L2_ERROR_BASE (0x000B0000)
-#define VCARD_ERROR_BASE (0x000A0000)
-
-#define MK_VCARD_ERROR_CODE(VCARD_ERROR)                                       \
-    ((VCARD_ERROR) ? (VCARD_ERROR_BASE | ERROR_BASE | VCARD_ERROR) : 0)
-
-//  VCARD ERROR CODES (Error codes from kernelmode driver)
-#ifndef CANL2_EXPORTS
-
-#define VCARD_OK (__u32)0                     // success
-#define VCARD_INTERNALERROR (__u32)0xE00A0001 // internal Error
-#define VCARD_GENERALERROR (__u32)0xE00A0002  // general Error
-#define VCARD_TIMEOUT (__u32)0xE00A0003       // Timeout
-#define VCARD_IOPENDING (__u32)0xE00A0004     // pending driver call
-#define VCARD_IOCANCELLED (__u32)0xE00A0005   // driver call was canceled
-#define VCARD_ILLEGALCALL (__u32)0xE00A0006   // illegal driver call
-#define VCARD_NOTSUPPORTED (__u32)0xE00A0007  // not implemented
-#define VCARD_VERSIONERROR                                                     \
-    (__u32)0xE00A0008 // driver interface dll has the wrong version
-#define VCARD_DRIVERVERSIONERROR (__u32)0xE00A0009 // wrong driver version
-#define VCARD_DRIVERNOTFOUND                                                   \
-    (__u32)0xE00A000A // driver not loaded / not installed, or device is not
-                      // plugged
-#define VCARD_NOTENOUGHMEMORY (__u32)0xE00A000B // out of memory
-#define VCARD_TOOMANYDEVICES                                                   \
-    (__u32)0xE00A000C // driver can not handle as much devices
-#define VCARD_UNKNOWNDEVICE (__u32)0xE00A000D       // unknown device
-#define VCARD_DEVICEALREADYEXISTS (__u32)0xE00A000E // device already exists
-#define VCARD_DEVICEACCESSERROR                                                \
-    (__u32)0xE00A000F // access is not possible: device is already open
-#define VCARD_RESOURCEALREADYREGISTERED                                        \
-    (__u32)0xE00A0010 // resource is in use by an other device
-#define VCARD_RESOURCECONFLICT (__u32)0xE00A0011 // resource conflict
-#define VCARD_RESOURCEACCESSERROR                                              \
-    (__u32)0xE00A0012 // resource can not be accessed
-#define VCARD_PHYSMEMORYOVERRUN                                                \
-    (__u32)0xE00A0013 // ungueltiger Zugriff auf physikalischen Speicher
-#define VCARD_TOOMANYPORTS (__u32)0xE00A0014 // zu viele I/O Ports 20
-#define VCARD_INTERRUPTERROR                                                   \
-    (__u32)0xE00A0015 // error while activating the interrupt
-#define VCARD_UNKNOWNRESOURCE (__u32)0xE00A0016 // unknown ressorce
-#define VCARD_CREATEDEVFAILED (__u32)0xE00A0017 // IoCreateDevice failed
-#define VCARD_ATTACHTODEVSTACKFAILED                                           \
-    (__u32)0xE00A0018 // IoAttachDeviceToDeviceStack failed
-#define VCARD_SYMBOLICLINKFAILED                                               \
-    (__u32)0xE00A0019 // failed to create a symbolic link
-
-//    Errors which can occur while downloading the firmware
-#define VCARD_NOCARDSERVICES                                                   \
-    (__u32)0xE00A001A // can not access card services under Win '98
-#define VCARD_CARDSERVICESVERSION                                              \
-    (__u32)0xE00A001B // wrong version of the card services under Win '98
-#define VCARD_CARDSERVICESGETINFO                                              \
-    (__u32)0xE00A001C // error while accessing the card services under Win '98
-#define VCARD_DEVICENOTFOUND (__u32)0xE00A001D // device not found.
-#define VCARD_NODPRAM                                                          \
-    (__u32)0xE00A001E // can not get a free address region for DPRAM from
-                      // system
-#define VCARD_CONTROLHWERROR (__u32)0xE00A001F // Error while accessing hardware
-#define VCARD_SBNCHECKSUM                                                      \
-    (__u32)0xE00A0020 // Checksum error in SBN format (dll binary may be
-                      // corrupt)
-#define VCARD_DPRAMACCESS (__u32)0xE00A0021 // can not access the DPRAM memory
-#define VCARD_CARDREACTION                                                     \
-    (__u32)0xE00A0022 // Loader program for firmware download does no more
-                      // react.
-#define VCARD_NOSTARTADDRESS                                                   \
-    (__u32)0xE00A0023 // No startaddress defined in SBN (dll binary may be
-                      // corrupt)
-#define VCARD_NOINTERRUPT (__u32)0xE00A0024 // Interrupt does not work
-
-//    Errors which can occur in the channel driver
-#define VCARD_DRIVERNOTPRESENT                                                 \
-    (__u32)0xE00A0025                        // Kernel mode driver is not loaded
-#define VCARD_DEVICEISOPEN (__u32)0xE00A0026 // Device is already open
-#define VCARD_DEVICELOCKINGERROR (__u32)0xE00A0027 // Device can not be locked
-#define VCARD_OTHERFWISLOADED                                                  \
-    (__u32)0xE00A0028 // A other firmware is running on that device
-                      // (CANalyzer/CANopen/DeviceNet firmware)
-#define VCARD_CHANNELNOTOPEN                                                   \
-    (__u32)0xE00A0029 // channel can not be accessed, because it is not open.
-
-//    Status codes for CANusb Device Driver canusbw.sys
-#define VCARD_PNPCALLERROR                                                     \
-    (__u32)0xE00A002A // lower driver call in PnP process fails
-#define VCARD_URBRETERROR (__u32)0xE00A002B // URB returns USBD_ERROR code
-#define VCARD_ERRORDEVICEDESC                                                  \
-    (__u32)0xE00A002C // faulty device desc or read failed
-#define VCARD_ERRORCONFIGDESC                                                  \
-    (__u32)0xE00A002D // faulty config desc or read failed
-#define VCARD_ERRORSELECTCONFIG                                                \
-    (__u32)0xE00A002E // unable to select configuration
-#define VCARD_ERRORDECONFIG                                                    \
-    (__u32)0xE00A002F // unable to deconfigure the device
-#define VCARD_PIPEACCESSERROR (__u32)0xE00A0030 // unable to open usb pipe
-#define VCARD_COMMUNICATIONBROKEN                                              \
-    (__u32)0xE00A0031 // communication via usb pipe broken off
-
-//    Errors which can occur in the canchd.dll
-#define VCARD_FILENOTFOUND (__u32)0xE00A0032 // file not found
-#define VCARD_ACCESSRIGHT (__u32)0xE00A0033
-
-#define VCARD_OSERROR (__u32)0xE00A0034 // error in OS call
-#define VCARD_DEVICEIDMISMATCH                                                 \
-    (__u32)0xE00A0035 // wrong device id stored in registry
-#define VCARD_MAXNUMOFCHANNELSOPEN                                             \
-    (__u32)0xE00A0036 // the maximum number of channels are open
-#define VCARD_INVALIDHANDLE (__u32)0xE00A0037 // a invalid handle is specified
-
-#endif
-
 #define CANL2_OK 0
 #define CANL2_ERR -1
 #define CANL2_BOARD_NOT_INITIALIZED -99
@@ -292,39 +199,6 @@ __s32 CANL2_reset_chip(CAN_HANDLE Can);
 __s32 CANL2_initialize_chip(CAN_HANDLE Can, __s32 presc, __s32 sjw, __s32 tseg1,
                             __s32 tseg2, __s32 sam);
 
-__s32 CANL2_set_mode(CAN_HANDLE Can, __s32 SleepMode, __s32 SpeedMode);
-
-__s32 CANL2_set_acceptance(CAN_HANDLE Can, __u32 AccCodeStd, __u32 AccMaskStd,
-                           __u32 AccCodeXtd, __u32 AccMaskXtd);
-
-__s32 CANL2_set_output_control(CAN_HANDLE Can, __s32 OutputControl);
-
-__s32 CANL2_initialize_interface(
-    CAN_HANDLE Can, __s32 ReceiveFifoEnable, __s32 ReceivePollAll,
-    __s32 ReceiveEnableAll, __s32 ReceiveIntEnableAll, __s32 AutoRemoteEnable,
-    __s32 TransmitReqFifoEnable, __s32 TransmitPollAll,
-    __s32 TransmitAckEnableAll, __s32 TransmitAckFifoEnable,
-    __s32 TransmitRmtFifoEnable);
-
-__s32 CANL2_define_object(CAN_HANDLE Can, __u32 Handle, __s32* ObjectNumber,
-                          __s32 Type, __s32 ReceiveIntEnable,
-                          __s32 AutoRemoteEnable, __s32 TransmitAckEnable);
-
-__s32 CANL2_define_cyclic(CAN_HANDLE Can, __s32 ObjectNumber, __u32 Rate,
-                          __u32 Cycles);
-
-__s32 CANL2_set_rcv_fifo_size(CAN_HANDLE Can, __s32 FifoSize);
-
-#define CANL2_WRONG_MODE -1001
-__s32 CANL2_enable_fifo(CAN_HANDLE Can);
-
-// this function has no effect on the CANcard
-__s32 CANL2_optimize_rcv_speed(CAN_HANDLE Can);
-
-__s32 CANL2_enable_dyn_obj_buf(CAN_HANDLE Can);
-
-__s32 CANL2_enable_fifo_transmit_ack(CAN_HANDLE Can);
-
 __s32 CANL2_initialize_fifo_mode(CAN_HANDLE Can, L2CONFIG* pUserCfg);
 
 __s32 CANL2_get_all_CAN_channels(__u32 u32ProvidedBufferSize,
@@ -344,29 +218,9 @@ __s32 CANL2_get_serial_number(CAN_HANDLE Can, __u32* ser_number);
 #define FRW_IOE_ERR_NOTENOUGHMEMORY -612 // not enough memory
 #define FRW_IOE_ERR_INITFAILED -613      // failed to initialize FRWOrder/Event
 
-__s32 CANL2_start_chip(CAN_HANDLE Can);
-
-__s32 CANL2_send_remote_object(CAN_HANDLE Can, __s32 ObjectNumber,
-                               __s32 DataLength);
-
-__s32 CANL2_supply_object_data(CAN_HANDLE Can, __s32 ObjectNumber,
-                               __s32 DataLength, __u8* pData);
-
-__s32 CANL2_supply_rcv_object_data(CAN_HANDLE Can, __s32 ObjectNumber,
-                                   __s32 DataLength, __u8* pData);
-
-__s32 CANL2_send_object(CAN_HANDLE Can, __s32 ObjectNumber, __s32 DataLength);
-
-__s32 CANL2_write_object(CAN_HANDLE Can, __s32 ObjectNumber, __s32 DataLength,
-                         __u8* pData);
-
 __s32 CANL2_read_rcv_data(CAN_HANDLE Can, __s32 ObjectNumber, __u8* pRCV_Data,
                           __u32* Time);
 
-__s32 CANL2_read_xmt_data(CAN_HANDLE Can, __s32 ObjectNumber,
-                          __s32* pDataLength, __u8* pXMT_Data);
-
-// +--- CANL2_read_ac                ---------------------------------------*/
 #define CANL2_RA_NO_DATA 0             // no new data received
 #define CANL2_RA_DATAFRAME 1           // std. data frame received
 #define CANL2_RA_REMOTEFRAME 2         // std. remote frame received
@@ -395,11 +249,6 @@ __s32 CANL2_send_data(CAN_HANDLE Can, __u32 Ident, __s32 Xtd, __s32 DataLength,
 __s32 CANL2_send_remote(CAN_HANDLE Can, __u32 Ident, __s32 Xtd,
                         __s32 DataLength);
 
-// these functions have no effect on the CANcard
-__s32 CANL2_get_trigger(CAN_HANDLE Can, __s32* level);
-
-__s32 CANL2_reinitialize(CAN_HANDLE Can);
-
 __s32 CANL2_get_time(CAN_HANDLE Can, __u32* time);
 
 #define CANL2_GBS_ERROR_ACTIVE 0  // error active
@@ -407,35 +256,12 @@ __s32 CANL2_get_time(CAN_HANDLE Can, __u32* time);
 #define CANL2_GBS_ERROR_BUS_OFF 2 // bus off
 __s32 CANL2_get_bus_state(CAN_HANDLE Can);
 
-__s32 CANL2_reset_rcv_fifo(CAN_HANDLE Can);
-
-__s32 CANL2_reset_xmt_fifo(CAN_HANDLE Can);
-
-__s32 CANL2_reset_lost_msg_counter(CAN_HANDLE Can);
-
-// returns number of items in receive fifo
-__s32 CANL2_read_rcv_fifo_level(CAN_HANDLE Can);
-
-// returns number of items in transmit fifo
-__s32 CANL2_read_xmt_fifo_level(CAN_HANDLE Can);
-
 __s32 INIL2_close_channel(CAN_HANDLE Can);
 
 // this function has no effect on the CAN-AC2
 __s32 CANL2_enable_error_frame_detection(CAN_HANDLE Can);
 
 __s32 CANL2_get_device_id(CAN_HANDLE Can, __u32* pulDeviceId);
-
-// these functions are only available on the CAN-ACx-PCI. They are designed
-// for use with the CAN-ACx-PCI and piggy-back boards. These functions are
-// not in the standard users manual. For description read the piggy-back manuals
-__s32 CANL2_init_signals(CAN_HANDLE Can, __u32 ulChannelDirectionMask,
-                         __u32 ulChannelOutputDefaults);
-
-__s32 CANL2_read_signals(CAN_HANDLE Can, __u32* pulChannelRead);
-
-__s32 CANL2_write_signals(CAN_HANDLE Can, __u32 pulChannelWrite,
-                          __u32 ulCareMask);
 
 } // extern "C"
 
