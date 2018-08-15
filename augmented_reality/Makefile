@@ -1,7 +1,6 @@
-GCC = @g++-6
-CFLAGS = -c -g -Wpedantic -std=c++17
-PRG = ar_app
+include ../Makefile.vars
 
+PRG = ar_app
 OBJS = MainAR.o SensorSimulator.o
 
 OPENCV = `pkg-config opencv --cflags --libs`

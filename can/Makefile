@@ -1,7 +1,6 @@
-GCC = @g++-6
-CFLAGS = -c -g -Wpedantic -std=c++17
-PRG = can_test
+include ../Makefile.vars
 
+PRG = can_test
 OBJS = BSFrameHandler.o CANproChannel.o \
 	   CANUtils.o CANTest.o DetectionGUI.o
 
@@ -15,8 +14,6 @@ DEPS = -lpthread \
 	   -lpng \
 	   -lasound \
 	   -lfontconfig
-
-all: $(PRG)
 
 $(PRG): $(OBJS)
 	@echo Linking...
