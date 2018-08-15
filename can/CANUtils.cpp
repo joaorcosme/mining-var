@@ -99,8 +99,8 @@ static void printDetectionData(const can::backsense::DetectionData& state)
 }
 
 void CANUtils::interruption(CAN_HANDLE channel,
-                                   backsense::RadarStateDB& stateDB,
-                                   std::future<void> futureSignal)
+                            backsense::RadarStateDB& stateDB,
+                            std::future<void> futureSignal)
 {
     DEBUG_INTERRUPTION("Thread start");
 

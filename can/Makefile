@@ -38,5 +38,4 @@ clean:
 	rm -f $(OBJS) $(PRG) *~
 
 format:
-	clang-format -style=file -i \
-		`find -name "*.h" -or -name "*.cpp"
+	clang-format -style=file -i	`find -name "*.h" -or -name "*.cpp"`

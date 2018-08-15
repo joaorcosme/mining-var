@@ -30,7 +30,6 @@
 #include <thread>
 #include <utility> // std::move
 
-
 int main(int argc, char** argv)
 {
     static constexpr unsigned N_SENSORS = 1;
