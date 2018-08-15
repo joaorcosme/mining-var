@@ -1,6 +1,6 @@
 GCC = @g++-6
 CFLAGS = -c -g -Wpedantic -std=c++17
-PRG = aaaar
+PRG = ar_app
 
 OBJS = MainAR.o SensorSimulator.o
 
