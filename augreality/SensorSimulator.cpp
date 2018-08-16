@@ -41,13 +41,13 @@ SensorSimulator::SensorSimulator(std::chrono::milliseconds interval)
 
 SensorSimulator::~SensorSimulator()
 {
-    m_leaving = true;
+    m_leaving.store(true);
     m_thread.join();
 }
 
 void SensorSimulator::updateFraction()
 {
-    while (!m_leaving) {
+    while (!m_leaving.load()) {
         std::this_thread::sleep_for(m_msInterval);
         m_fraction.store(generateRandom(0.0, 1.0));
     }

@@ -15,7 +15,7 @@ format:
 tags:
 	@echo Generating tags...
 	@echo --------------------------------
-	@ctags -R --languages=c++
+	@ctags -R --languages=c++ .
 
 .PHONY: clean
 

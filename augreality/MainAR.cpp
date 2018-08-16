@@ -18,108 +18,74 @@
  *
  */
 
-#include "SensorSimulator.h"
+#include "BarGraph.h"
+
+#include "../can/BSFrameHandler.h"
+#include "../can/CANUtils.h"
+#include "../can/CANproChannel.h"
 
 #include <opencv2/core.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/videoio.hpp>
 
-#include <chrono>
-#include <string>
+#include <future>
+#include <stdexcept>
+#include <thread>
 #include <utility>
 #include <vector>
 
-class BarGraph
-{
-  public:
-    BarGraph() = delete;
-    BarGraph(const cv::Point& startPt, const double width, const double height,
-             unsigned nTiles = 25)
-    {
-        const double totalSpacing = 0.2 * height;
-        const double spacing = totalSpacing / (nTiles - 1);
-        const double tileHeight = (height - totalSpacing) / nTiles;
-        const cv::Size tileSize(width, tileHeight);
-        cv::Point pt = startPt;
-
-        m_txtOrg.x = startPt.x;
-        m_txtOrg.y = startPt.y - 5;
-
-        unsigned i = 0;
-        while (i++ < nTiles) {
-            m_tiles.emplace_back(pt, tileSize);
-            pt.y += spacing + tileHeight;
-        }
-    }
-
-    unsigned getNumberOfTiles() { return m_tiles.size(); }
-
-    void draw(cv::Mat& frame, const double fraction);
-
-  private:
-    void drawPercentageTxt(cv::Mat& frame, const double fraction);
-
-  private:
-    std::vector<cv::Rect> m_tiles;
-    cv::Point m_txtOrg;
-    static constexpr int m_fontFace = cv::FONT_HERSHEY_SIMPLEX;
-};
-
-void BarGraph::draw(cv::Mat& frame, const double fraction)
-{
-    assert(fraction >= 0 && fraction <= 1);
-    const int nFilledTiles = fraction * getNumberOfTiles();
-    int i = 0;
-    for (const auto& tile : m_tiles) {
-        int thickness = 1;
-        cv::Scalar tileColor(255, 255, 255);
-        if (i++ < nFilledTiles) {
-            // negative thickness yields a filled rectangle
-            thickness = -1;
-            tileColor = cv::Scalar(0, 255, 0);
-        }
-        cv::rectangle(frame, tile, tileColor, thickness);
-    }
-    drawPercentageTxt(frame, fraction);
-}
-
-void BarGraph::drawPercentageTxt(cv::Mat& frame, const double fraction)
-{
-    std::string txt = std::to_string(static_cast<int>(100 * fraction));
-    txt += "%";
-    cv::putText(frame, txt, m_txtOrg, m_fontFace, 1, cv::Scalar(0, 0, 255), 2);
-}
-
 int main(int argc, char** argv)
 {
-    cv::Mat frame;
-    cv::VideoCapture cap;
+    try {
+        static constexpr unsigned N_SENSORS = 1;
 
-    // access built-in camera at index 0
-    assert(cap.open(0));
+        can::CANproChannel channel;
+        can::backsense::RadarStateDB stateDB(N_SENSORS);
 
-    BarGraph bGraph1(cv::Point(50, 50), 80, 300);
-    BarGraph bGraph2(cv::Point(200, 50), 80, 300);
-    BarGraph bGraph3(cv::Point(350, 50), 80, 300);
+        // Start a task to handle the CAN bus and DB updates
+        std::promise<void> exitSignal;
+        std::future<void> futureSignal = exitSignal.get_future();
+        std::thread canHandler(can::CANUtils::interruption, channel.getHandle(),
+                               std::ref(stateDB), std::move(futureSignal));
 
-    using namespace std::chrono_literals;
-    augreality::SensorSimulator sensor1(1500ms);
-    augreality::SensorSimulator sensor2(1500ms);
-    augreality::SensorSimulator sensor3(1500ms);
+        // TODO: extract this section (probably into a separate thread)
+        // For now, it's just an experiment to connect the CAN DB and the AR
+        // display
+        // --------------------------(start)
+        cv::Mat frame;
+        cv::VideoCapture cap;
 
-    while (true) {
-        cap >> frame;
-        assert(!frame.empty());
+        // access built-in camera at index 0
+        assert(cap.open(0));
 
-        bGraph1.draw(frame, sensor1.getFraction());
-        bGraph2.draw(frame, sensor2.getFraction());
-        bGraph3.draw(frame, sensor3.getFraction());
+        augreality::BarGraph bGraph(cv::Point(200, 50), 80, 300);
+        while (true) {
+            cap >> frame;
+            assert(!frame.empty());
 
-        cv::imshow("Live", frame);
-        if (cv::waitKey(5) >= 0) {
-            break;
+            auto data = stateDB.getSensorData(0)[0];
+            auto frac = 0.0;
+            if (data) {
+                frac = data->getX() / 30.0;
+            }
+            bGraph.draw(frame, frac);
+
+            cv::imshow("Live", frame);
+            if (cv::waitKey(5) >= 0) {
+                break;
+            }
         }
+        // --------------------------(end)
+
+        // notify interruption thread
+        exitSignal.set_value();
+
+        can::CANUtils::resetChip(channel.getHandle());
+        canHandler.join();
+
+    } catch (std::runtime_error& ex) {
+        std::cerr << "#ERROR: " << ex.what() << std::endl;
     }
 
     return 0;

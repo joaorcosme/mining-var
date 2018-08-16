@@ -1,8 +1,10 @@
 include ../Makefile.vars
 
 PRG = can_test
-OBJS = BSFrameHandler.o CANproChannel.o \
-	   CANUtils.o CANTest.o DetectionGUI.o
+OUT_LIB = libcan.a
+OUT_OBJS = BSFrameHandler.o CANproChannel.o \
+		   CANUtils.o DetectionGUI.o
+OBJS = $(OUT_OBJS) CANTest.o
 
 DEPS = -lpthread \
 	   -lSoftingCan \
@@ -16,6 +18,8 @@ DEPS = -lpthread \
 	   -lfontconfig
 
 $(PRG): $(OBJS)
+	@echo Creating $(OUT_LIB)...
+	@ar rcs $(OUT_LIB) $(OUT_OBJS)
 	@echo Linking...
 	$(GCC) $^ -o $@ $(DEPS)
 

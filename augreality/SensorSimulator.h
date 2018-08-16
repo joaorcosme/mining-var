@@ -42,9 +42,9 @@ class SensorSimulator
 
   private:
     std::thread m_thread;
-    std::atomic<double> m_fraction;
     std::chrono::milliseconds m_msInterval;
-    bool m_leaving{false};
+    std::atomic<double> m_fraction;
+    std::atomic<bool> m_leaving{false};
 };
 
 } // namespace augreality

@@ -1,10 +1,11 @@
 include ../Makefile.vars
 
 PRG = ar_app
-OBJS = MainAR.o SensorSimulator.o
+OBJS = MainAR.o SensorSimulator.o BarGraph.o
 
 OPENCV = `pkg-config opencv --cflags --libs`
-DEPS = -lpthread $(OPENCV)
+DEPS = -lpthread $(OPENCV) \
+	   -L../can -lcan -lSoftingCan
 
 $(PRG): $(OBJS)
 	@echo Linking...
