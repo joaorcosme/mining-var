@@ -30,7 +30,8 @@ namespace augreality {
 class SensorSimulator
 {
   public:
-    SensorSimulator() = delete;
+    SensorSimulator(const SensorSimulator& other) = delete;
+    SensorSimulator& operator=(const SensorSimulator&) = delete;
 
     SensorSimulator(std::chrono::milliseconds interval);
     ~SensorSimulator();
