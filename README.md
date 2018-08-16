@@ -24,11 +24,9 @@ If these libraries are correctly installed, you just need to run `make` on the r
 
 After compiling, there will be 2 executables in the project directory:
 
-- `./can/can_test`
-This will launch a window that displays real-time data from the BS-9000 Radar sensor.
+- `./can/can_test`: this will launch a window that displays real-time data from the BS-9000 Radar sensor.
 
-- `./augreality/ar_app`
-This will launch an AR window that displays video from the default camera + sensor data translated into graphical elements.
+- `./augreality/ar_app`: this will launch an AR window that displays video from the default camera + sensor data translated into graphical elements.
 
 #### License
 
