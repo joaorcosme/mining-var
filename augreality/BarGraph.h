@@ -23,7 +23,8 @@
 
 #include <opencv2/core.hpp>
 
-#include <vector>
+#include <deque>
+#include <string>
 
 namespace augreality {
 
@@ -31,19 +32,24 @@ class BarGraph
 {
   public:
     BarGraph(const cv::Point& startPt, const double width, const double height,
-             unsigned nTiles = 25);
+             const unsigned nTiles = 25, const bool upsideDown = false);
 
     unsigned getNumberOfTiles() const { return m_tiles.size(); }
 
     void draw(cv::Mat& frame, const double fraction);
-
-  private:
+    void drawTxt(cv::Mat& frame, const std::string& txt);
     void drawPercentageTxt(cv::Mat& frame, const double fraction);
 
   private:
-    std::vector<cv::Rect> m_tiles;
+    std::deque<cv::Rect> m_tiles;
     cv::Point m_txtOrg;
+
+    // BGR
+    cv::Scalar m_borderColor{255, 255, 255};
+    cv::Scalar m_fillColor;
+
     static constexpr int m_fontFace = cv::FONT_HERSHEY_SIMPLEX;
+    bool m_upsideDown = false;
 };
 
 } // namespace augreality

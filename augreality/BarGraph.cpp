@@ -24,23 +24,39 @@
 
 #include <string>
 
+static auto getColorFromFraction(const double fraction)
+{
+    if (fraction > 2.0 / 3.0) {
+        return cv::Scalar(0, 255, 0); // green
+    }
+    if (fraction > 1.0 / 3.0) {
+        return cv::Scalar(0, 255, 255); // yellow
+    }
+    return cv::Scalar(0, 0, 255); // red
+}
+
 using augreality::BarGraph;
 
 BarGraph::BarGraph(const cv::Point& startPt, const double width,
-                   const double height, unsigned nTiles)
+                   const double height, const unsigned nTiles,
+                   const bool upsideDown)
 {
-    const double totalSpacing = 0.2 * height;
+    const double totalSpacing = 0.3 * height;
     const double spacing = totalSpacing / (nTiles - 1);
     const double tileHeight = (height - totalSpacing) / nTiles;
     const cv::Size tileSize(width, tileHeight);
+
+    m_txtOrg.x = startPt.x - 3;
+    m_txtOrg.y = startPt.y - 8;
+
     cv::Point pt = startPt;
-
-    m_txtOrg.x = startPt.x;
-    m_txtOrg.y = startPt.y - 5;
-
     unsigned i = 0;
     while (i++ < nTiles) {
-        m_tiles.emplace_back(pt, tileSize);
+        if (upsideDown) {
+            m_tiles.emplace_back(pt, tileSize);
+        } else {
+            m_tiles.emplace_front(pt, tileSize);
+        }
         pt.y += spacing + tileHeight;
     }
 }
@@ -48,24 +64,23 @@ BarGraph::BarGraph(const cv::Point& startPt, const double width,
 void BarGraph::draw(cv::Mat& frame, const double fraction)
 {
     assert(fraction >= 0 && fraction <= 1);
-    const int nFilledTiles = fraction * getNumberOfTiles();
+    m_fillColor = getColorFromFraction(fraction);
+    const int nTilesToBeFilled = fraction * getNumberOfTiles();
     int i = 0;
     for (const auto& tile : m_tiles) {
-        int thickness = 1;
-        cv::Scalar tileColor(255, 255, 255);
-        if (i++ < nFilledTiles) {
-            // negative thickness yields a filled rectangle
-            thickness = -1;
-            tileColor = cv::Scalar(0, 255, 0);
-        }
-        cv::rectangle(frame, tile, tileColor, thickness);
+        // negative thickness yields a filled rectangle
+        int thickness = (i++ < nTilesToBeFilled) ? -1 : 1;
+        cv::rectangle(frame, tile,
+                      (thickness > 0 ? m_borderColor : m_fillColor), thickness);
     }
-    drawPercentageTxt(frame, fraction);
 }
 
 void BarGraph::drawPercentageTxt(cv::Mat& frame, const double fraction)
 {
-    std::string txt = std::to_string(static_cast<int>(100 * fraction));
-    txt += "%";
-    cv::putText(frame, txt, m_txtOrg, m_fontFace, 1, cv::Scalar(0, 0, 255), 2);
+    drawTxt(frame, std::to_string(static_cast<int>(100 * fraction)) + "%");
+}
+
+void BarGraph::drawTxt(cv::Mat& frame, const std::string& txt)
+{
+    cv::putText(frame, txt, m_txtOrg, m_fontFace, 1, cv::Scalar(158, 46, 33), 2);
 }

@@ -19,6 +19,7 @@
  */
 
 #include "BarGraph.h"
+#include "SensorSimulator.h"
 
 #include "../can/BSFrameHandler.h"
 #include "../can/CANUtils.h"
@@ -29,8 +30,10 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/videoio.hpp>
 
+#include <chrono>
 #include <future>
 #include <stdexcept>
+#include <iomanip>
 #include <thread>
 #include <utility>
 #include <vector>
@@ -59,7 +62,9 @@ int main(int argc, char** argv)
         // access built-in camera at index 0
         assert(cap.open(0));
 
-        augreality::BarGraph bGraph(cv::Point(200, 50), 80, 300);
+        using namespace std::chrono_literals;
+        augreality::SensorSimulator s1(2000ms);
+        augreality::BarGraph bGraph(cv::Point(50, 70), 60, 300);
         while (true) {
             cap >> frame;
             assert(!frame.empty());
@@ -67,12 +72,17 @@ int main(int argc, char** argv)
             auto data = stateDB.getSensorData(0)[0];
             auto frac = 0.0;
             if (data) {
-                frac = data->getX() / 30.0;
+                auto polarRadius = data->getPolarRadius();
+                std::stringstream ss;
+                ss << std::setprecision(3) << polarRadius << "m";
+                bGraph.drawTxt(frame, ss.str());
+                frac = polarRadius / 2.0;
             }
+            //auto frac = s1.getFraction();
             bGraph.draw(frame, frac);
 
             cv::imshow("Live", frame);
-            if (cv::waitKey(5) >= 0) {
+            if (cv::waitKey(5) == 27) { // Esc
                 break;
             }
         }
