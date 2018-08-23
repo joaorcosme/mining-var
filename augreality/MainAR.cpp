@@ -64,7 +64,7 @@ static void launchARWindowLoop(const can::backsense::RadarStateDB& stateDB)
     //        <-------------->
     //      -5m             +5m
 
-    constexpr unsigned MAX_PHY_X = 10;
+    constexpr unsigned MAX_PHY_X = 30;
     constexpr unsigned MAX_PHY_Y = +5;
     constexpr unsigned MIN_PHY_Y = -5;
     constexpr unsigned DISPLAY_SPACING_X = 20;
