@@ -1,4 +1,4 @@
-include ../Makefile.vars
+include ../Makefile.defines
 
 PRG = can_test
 OUT_LIB = libcan.a

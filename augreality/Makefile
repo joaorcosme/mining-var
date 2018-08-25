@@ -1,4 +1,4 @@
-include ../Makefile.vars
+include ../Makefile.defines
 
 PRG = ar_app
 OBJS = MainAR.o SensorSimulator.o BarGraph.o
