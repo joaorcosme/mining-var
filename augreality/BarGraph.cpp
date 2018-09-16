@@ -63,7 +63,7 @@ BarGraph::BarGraph(const cv::Point& startPt, const double width,
 
 void BarGraph::draw(cv::Mat& frame, const double fraction)
 {
-    assert(fraction >= 0 && fraction <= 1);
+    //assert(fraction >= 0 && fraction <= 1);
     m_fillColor = getColorFromFraction(fraction);
     const int nTilesToBeFilled = fraction * getNumberOfTiles();
     int i = 0;

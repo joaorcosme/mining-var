@@ -54,10 +54,6 @@ static void launchARWindowLoop(const can::backsense::RadarStateDB& stateDB)
         throw std::runtime_error("Can't open camera.");
     }
 
-    // use the sensor simulator for debbugging
-    using namespace std::chrono_literals;
-    augreality::SensorSimulator s1(2000ms);
-
     augreality::BarGraph bGraph(cv::Point(50, 70), 60, 300);
 
     while (cv::waitKey(5) != 27) { // Esc key
@@ -65,14 +61,14 @@ static void launchARWindowLoop(const can::backsense::RadarStateDB& stateDB)
         assert(!frame.empty());
         // take the closest object's data, for the sensor at index 0
         auto detectionData = stateDB.getSensorData(0)[0];
-        //auto frac = 0.0;
-        //if (detectionData) {
-        //    auto polarRadius = detectionData->getPolarRadius();
-        //    bGraph.drawTxt(
-        //        frame, buildDisplayTextValue(frac));
-        //    frac = polarRadius / 30.0;
-        //}
-        auto frac = s1.getFraction();
+        auto frac = 0.0;
+        if (detectionData) {
+            auto polarRadius = detectionData->getPolarRadius();
+            bGraph.drawTxt(frame, buildDisplayTextValue(polarRadius));
+
+            static constexpr double MAX_RADIUS = 5.0;
+            frac = polarRadius / MAX_RADIUS;
+        }
         bGraph.draw(frame, frac);
         cv::imshow("Live", frame);
     }
@@ -83,23 +79,23 @@ int main(int argc, char** argv)
     try {
         static constexpr unsigned N_SENSORS = 1;
 
-        //can::CANproChannel channel;
+        can::CANproChannel channel;
         can::backsense::RadarStateDB stateDB(N_SENSORS);
 
         // start a task to handle the CAN bus and DB updates
-        //std::promise<void> exitSignal;
-        //std::future<void> futureSignal = exitSignal.get_future();
-        //std::thread canHandler(can::CANUtils::interruption, channel.getHandle(),
-        //                       std::ref(stateDB), std::move(futureSignal));
+        std::promise<void> exitSignal;
+        std::future<void> futureSignal = exitSignal.get_future();
+        std::thread canHandler(can::CANUtils::interruption, channel.getHandle(),
+                               std::ref(stateDB), std::move(futureSignal));
 
         // blocking call: loop until the user quits
         launchARWindowLoop(stateDB);
 
         // notify interruption thread
-        //exitSignal.set_value();
+        exitSignal.set_value();
 
-        //can::CANUtils::resetChip(channel.getHandle());
-        //canHandler.join();
+        can::CANUtils::resetChip(channel.getHandle());
+        canHandler.join();
 
     } catch (std::runtime_error& ex) {
         std::cerr << "#ERROR: " << ex.what() << std::endl;
