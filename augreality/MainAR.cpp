@@ -45,6 +45,7 @@ static void launchARWindowLoop(const can::backsense::RadarStateDB& stateDB)
 
     cap >> frame;
 
+    //
     // 30m ^  +--------------+
     //     |  |              |
     //     |  |              |
@@ -63,6 +64,7 @@ static void launchARWindowLoop(const can::backsense::RadarStateDB& stateDB)
     //
     //        <-------------->
     //      -5m             +5m
+    //
 
     constexpr unsigned MAX_PHY_X = 10;
     constexpr unsigned MAX_PHY_Y = +5;
