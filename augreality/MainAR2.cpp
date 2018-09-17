@@ -19,7 +19,6 @@
  */
 
 #include "BarGraph.h"
-#include "SensorSimulator.h"
 
 #include "../can/BSFrameHandler.h"
 #include "../can/CANUtils.h"
