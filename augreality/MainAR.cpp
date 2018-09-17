@@ -56,6 +56,21 @@ static void launchARWindowLoop(const can::backsense::RadarStateDB& stateDB)
 
     augreality::BarGraph bGraph(cv::Point(50, 70), 60, 300);
 
+    //
+    //    X ^
+    //      |
+    //      |
+    //      |
+    //      +------>
+    //             Y
+    //
+
+    cap >> frame;
+    constexpr auto spacing = 10;
+    const auto sensorX = frame.rows - spacing;
+    const auto sensorY = frame.cols / 2;
+    const cv::Point sensorP(sensorY, sensorX);
+
     while (cv::waitKey(5) != 27) { // Esc key
         cap >> frame;
         assert(!frame.empty());
@@ -63,11 +78,32 @@ static void launchARWindowLoop(const can::backsense::RadarStateDB& stateDB)
         auto detectionData = stateDB.getSensorData(0)[0];
         auto frac = 0.0;
         if (detectionData) {
+
+            // draw numerical distance
             auto polarRadius = detectionData->getPolarRadius();
             bGraph.drawTxt(frame, buildDisplayTextValue(polarRadius));
 
+            // calculate fraction to fill bar graph
             static constexpr double MAX_RADIUS = 5.0;
             frac = polarRadius / MAX_RADIUS;
+
+            // draw an arrow to indicate the angle
+            auto angleDeg = detectionData->getPolarAngle();
+            static const double pi = std::atan(1.0) * 4.0;
+            auto angleRad = (pi / 180.0) * angleDeg;
+
+            static constexpr double ARROW_LENGTH = 50.0;
+            static const cv::Scalar arrowColor(0, 255, 255);
+            const auto arrowY = (angleRad > 0 ? 1 : -1) * ARROW_LENGTH *
+                                    std::sin(std::abs(angleRad)) +
+                                sensorY;
+            const auto arrowX =
+                -ARROW_LENGTH * std::cos(std::abs(angleRad)) + sensorX;
+            cv::arrowedLine(frame, sensorP, cv::Point(arrowY, arrowX),
+                            arrowColor, 1 /* thickness */,
+                            cv::LINE_8 /* line type */, 0, 0.3 /* tip length*/);
+            cv::circle(frame, sensorP, 6 /* radius */, arrowColor, 1,
+                       cv::LINE_AA);
         }
         bGraph.draw(frame, frac);
         cv::imshow("Live", frame);
