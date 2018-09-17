@@ -157,5 +157,4 @@ void CANUtils::interruption(CAN_HANDLE channel,
 
 endthread:
     DEBUG_INTERRUPTION("Thread end");
-    return;
 }
