@@ -32,6 +32,7 @@
 #include <array>
 #include <experimental/optional>
 #include <iostream>
+#include <mutex>
 #include <unordered_map>
 #include <vector>
 
@@ -124,6 +125,9 @@ class RadarStateDB
 
   private:
     void autoClear();
+
+  public:
+    mutable std::mutex mutex_db;
 
   private:
     std::vector<DetectionDataVec> m_db;

@@ -32,6 +32,7 @@
 #include <chrono>
 #include <future>
 #include <iomanip>
+#include <mutex>
 #include <stdexcept>
 #include <thread>
 #include <utility>
@@ -73,8 +74,17 @@ static void launchARWindowLoop(const can::backsense::RadarStateDB& stateDB)
     while (cv::waitKey(5) != 27) { // Esc key
         cap >> frame;
         assert(!frame.empty());
-        // take the closest object's data, for the sensor at index 0
-        auto detectionData = stateDB.getSensorData(0)[0];
+        std::experimental::optional<can::backsense::DetectionData>
+            detectionData;
+        {
+            // take the closest object's data, for the sensor at index 0
+            std::lock_guard<std::mutex> lock(stateDB.mutex_db);
+            auto s0Data = stateDB.getSensorData(0);
+            if (!s0Data.empty())
+            {
+                detectionData = s0Data[0];
+            }
+        }
         auto frac = 0.0;
         if (detectionData) {
 

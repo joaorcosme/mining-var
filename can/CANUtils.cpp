@@ -150,6 +150,7 @@ void CANUtils::interruption(CAN_HANDLE channel,
                 // we've read the raw data from the CAN bus, converted into
                 // a DetectionData object, and now we are able to update the DB,
                 // overwriting the state for the corresponding object id.
+                std::lock_guard<std::mutex> lock(stateDB.mutex_db);
                 stateDB.updateState(std::move(*state));
             }
         }
