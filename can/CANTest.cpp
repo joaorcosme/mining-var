@@ -35,14 +35,14 @@ int main(int argc, char** argv)
     static constexpr unsigned N_SENSORS = 1;
 
     try {
-        //can::CANproChannel channel;
+        can::CANproChannel channel;
         can::backsense::RadarStateDB stateDB(N_SENSORS);
 
         std::promise<void> exitSignal;
         std::future<void> futureSignal = exitSignal.get_future();
-        //std::thread readingHandler(can::CANUtils::readMsgs,
-          //                              channel.getHandle(), std::ref(stateDB),
-            //                            std::move(futureSignal));
+        std::thread readingHandler(can::CANUtils::readMsgs,
+                                   channel.getHandle(), std::ref(stateDB),
+                                   std::move(futureSignal));
 
         gui::DetectionGUI interface(stateDB);
         // blocking call
@@ -51,8 +51,8 @@ int main(int argc, char** argv)
         // notify interruption thread
         exitSignal.set_value();
 
- //       can::CANUtils::resetChip(channel.getHandle());
- //       readingHandler.join();
+        can::CANUtils::resetChip(channel.getHandle());
+        readingHandler.join();
 
     } catch (std::runtime_error& ex) {
         std::cerr << "#ERROR: " << ex.what() << std::endl;
