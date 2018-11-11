@@ -130,7 +130,7 @@ void CANproChannel::setFifoMode()
 
 void CANproChannel::setLayer2Configuration()
 {
-
+    // 500 Kbits/sec, as specified in the BS-9000 system manual
     m_l2Config.fBaudrate = 500.00;
     m_l2Config.s32Prescaler = 8;
     m_l2Config.s32Tseg1 = 11;

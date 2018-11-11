@@ -47,8 +47,8 @@ class CANUtils
     static int readBusEvent(CAN_HANDLE can, PARAM_STRUCT& retParam);
     static void resetChip(CAN_HANDLE can) { CANL2_reset_chip(can); }
     static void printReceivedData(int frc, const PARAM_STRUCT& param);
-    static void interruption(CAN_HANDLE channel,
-                             backsense::RadarStateDB& stateDB,
+    static void readMsgs(CAN_HANDLE channel,
+                           backsense::RadarStateDB& stateDB,
                              std::future<void> futureSignal);
 
   private:

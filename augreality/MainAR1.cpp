@@ -128,7 +128,7 @@ int main(int argc, char** argv)
         // start a task to handle the CAN bus and DB updates
         std::promise<void> exitSignal;
         std::future<void> futureSignal = exitSignal.get_future();
-        std::thread canHandler(can::CANUtils::interruption, channel.getHandle(),
+        std::thread canHandler(can::CANUtils::readMsgs, channel.getHandle(),
                                std::ref(stateDB), std::move(futureSignal));
 
         // blocking call: loop until the user quits

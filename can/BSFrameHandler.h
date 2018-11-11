@@ -41,7 +41,9 @@ namespace can {
 namespace backsense {
 
 static constexpr unsigned MAX_N_OBJS = 8;
-static constexpr unsigned MAX_N_SENSORS = 8;
+//static constexpr unsigned MAX_N_SENSORS = 8;
+// hacking to 1 since we aint using more than 1
+static constexpr unsigned MAX_N_SENSORS = 1;
 
 class FrameHandler;
 

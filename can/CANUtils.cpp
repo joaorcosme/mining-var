@@ -33,9 +33,9 @@
 #include <iostream>
 #include <sstream>
 
-#define DEBUG_INTERRUPTION(MSG)                                                \
+#define DEBUG_READMSGS(MSG)                                                \
     if (false)                                                                 \
-    std::cout << "#DEBUG: Interruption Thread :::: " << MSG << std::endl
+    std::cout << "#DEBUG: ReadMsgs Thread :::: " << MSG << std::endl
 
 #define DEBUG_RECV_DATA false
 
@@ -98,24 +98,23 @@ static void printDetectionData(const can::backsense::DetectionData& state)
     std::cout << ss.str();
 }
 
-void CANUtils::interruption(CAN_HANDLE channel,
+void CANUtils::readMsgs(CAN_HANDLE channel,
                             backsense::RadarStateDB& stateDB,
                             std::future<void> futureSignal)
 {
-    DEBUG_INTERRUPTION("Thread start");
+    DEBUG_READMSGS("Thread start");
 
     struct pollfd can_poll;
+    can_poll.fd = CANL2_handle_to_descriptor(channel);
+    can_poll.events = POLLIN | POLLHUP;
 
     backsense::FrameHandler frameHandler;
 
     while (!shouldTerminate(futureSignal)) {
 
-        can_poll.fd = CANL2_handle_to_descriptor(channel);
-        can_poll.events = POLLIN | POLLHUP;
-
         int ret = 0;
 
-        DEBUG_INTERRUPTION("Poll section");
+        DEBUG_READMSGS("Poll section");
         // wait for event on file descriptor
         while (ret <= 0) {
             ret = poll(&can_poll, 1 /*nfds*/, -1 /*timeout*/);
@@ -128,7 +127,7 @@ void CANUtils::interruption(CAN_HANDLE channel,
             }
         }
 
-        DEBUG_INTERRUPTION("Read section");
+        DEBUG_READMSGS("Read section");
         // descriptor is ready to be read
         PARAM_STRUCT outParam;
         while ((ret = CANUtils::readBusEvent(channel, outParam))) {
@@ -157,5 +156,5 @@ void CANUtils::interruption(CAN_HANDLE channel,
     }
 
 endthread:
-    DEBUG_INTERRUPTION("Thread end");
+    DEBUG_READMSGS("Thread end");
 }
